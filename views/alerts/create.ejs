@@ -1,0 +1,71 @@
+<%- include('../layout', { title: 'יצירת התראה', content: `
+<div class="container mt-4">
+    <h1><i class="fas fa-bell"></i> יצירת התראה</h1>
+    
+    <% if (typeof error !== 'undefined' && error) { %>
+        <div class="alert alert-danger"><%= error %></div>
+    <% } %>
+    
+    <div class="card mt-4">
+        <div class="card-body">
+            <form method="POST" action="/alerts/create">
+                <div class="mb-3">
+                    <label for="title" class="form-label">כותרת</label>
+                    <input type="text" class="form-control" id="title" name="title" placeholder="כותרת ההתראה">
+                </div>
+                
+                <div class="mb-3">
+                    <label for="message" class="form-label">הודעה *</label>
+                    <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="type" class="form-label">סוג</label>
+                            <select class="form-control" id="type" name="type">
+                                <option value="info">מידע</option>
+                                <option value="warning">אזהרה</option>
+                                <option value="error">שגיאה</option>
+                                <option value="success">הצלחה</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="priority" class="form-label">עדיפות</label>
+                            <select class="form-control" id="priority" name="priority">
+                                <option value="low">נמוכה</option>
+                                <option value="normal" selected>רגילה</option>
+                                <option value="high">גבוהה</option>
+                                <option value="urgent">דחוף</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="expiresAt" class="form-label">תאריך תפוגה (אופציונלי)</label>
+                    <input type="datetime-local" class="form-control" id="expiresAt" name="expiresAt">
+                </div>
+                
+                <div class="mb-3">
+                    <label for="targetUsers" class="form-label">משתמשים ספציפיים (מופרדים בפסיק, ריק = כולם)</label>
+                    <input type="text" class="form-control" id="targetUsers" name="targetUsers" placeholder="user1, user2">
+                </div>
+                
+                <div class="mb-3">
+                    <label for="targetRoles" class="form-label">תפקידים ספציפיים (מופרדים בפסיק, ריק = כולם)</label>
+                    <input type="text" class="form-control" id="targetRoles" name="targetRoles" placeholder="admin, itdepartment">
+                </div>
+                
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> שמור התראה
+                </button>
+                <a href="/alerts" class="btn btn-secondary">ביטול</a>
+            </form>
+        </div>
+    </div>
+</div>
+` }) %>
+

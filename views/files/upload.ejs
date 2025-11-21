@@ -1,0 +1,26 @@
+<%- include('../layout', { title: 'העלאת קבצים', content: `
+<div class="container mt-4">
+    <h1><i class="fas fa-upload"></i> העלאת קבצים</h1>
+    
+    <% if (typeof error !== 'undefined' && error) { %>
+        <div class="alert alert-danger"><%= error %></div>
+    <% } %>
+    
+    <div class="card mt-4">
+        <div class="card-body">
+            <form method="POST" action="/files/upload" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label for="file" class="form-label">בחר קובץ</label>
+                    <input type="file" class="form-control" id="file" name="file" required>
+                    <div class="form-text">גודל מקסימלי: 10MB</div>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-upload"></i> העלה קובץ
+                </button>
+                <a href="/files/list" class="btn btn-secondary">רשימת קבצים</a>
+            </form>
+        </div>
+    </div>
+</div>
+` }) %>
+

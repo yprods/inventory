@@ -1,0 +1,226 @@
+<%- include('../layout', { title: `מחשב - ${computer.Name || computer.name}`, content: `
+<div class="container mt-4 fade-in">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="display-5 fw-bold">
+            <i class="fas fa-desktop text-primary"></i> <%= computer.Name || computer.name %>
+        </h1>
+        <div>
+            <a href="/computers" class="btn btn-secondary">
+                <i class="fas fa-arrow-right"></i> חזרה לרשימה
+            </a>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-lg mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-info-circle"></i> פרטי מחשב</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong><i class="fas fa-laptop-code"></i> מערכת הפעלה:</strong>
+                            <p><%= computer.f3 || 'לא צוין' %></p>
+                        </div>
+                        <div class="col-md-6">
+                            <strong><i class="fas fa-info-circle"></i> סטטוס:</strong>
+                            <p><span class="badge bg-<%= computer.f1 === 'Active' ? 'success' : computer.f1 === 'Maintenance' ? 'warning' : 'secondary' %>"><%= computer.f1 || 'Unknown' %></span></p>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong><i class="fas fa-microchip"></i> מעבד (CPU):</strong>
+                            <p><%= computer.f4 || 'לא צוין' %></p>
+                        </div>
+                        <div class="col-md-6">
+                            <strong><i class="fas fa-memory"></i> זיכרון (RAM):</strong>
+                            <p><%= computer.f5 || 'לא צוין' %></p>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong><i class="fas fa-hdd"></i> דיסק קשיח (HDD):</strong>
+                            <p><%= computer.f7 || 'לא צוין' %></p>
+                        </div>
+                        <div class="col-md-6">
+                            <strong><i class="fas fa-network-wired"></i> כתובת IP:</strong>
+                            <p><%= computer.f8 || 'לא צוין' %></p>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong><i class="fas fa-map-marker-alt"></i> מיקום:</strong>
+                            <p><%= computer.f2 || 'לא צוין' %></p>
+                        </div>
+                        <div class="col-md-6">
+                            <strong><i class="fas fa-user"></i> משתמש מוקצה:</strong>
+                            <p><%= computer.f9 || 'לא צוין' %></p>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong><i class="fas fa-tag"></i> דגם:</strong>
+                            <p><%= computer.f10 || 'לא צוין' %></p>
+                        </div>
+                    </div>
+                    <% if (computer.f11) { %>
+                        <div class="mb-3">
+                            <strong><i class="fas fa-align-right"></i> תיאור:</strong>
+                            <p><%= computer.f11 %></p>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+            
+            <!-- Attachments -->
+            <% if (attachments && attachments.length > 0) { %>
+                <div class="card shadow-md mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-paperclip"></i> קבצים מצורפים</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="list-group">
+                            <% attachments.forEach(att => { %>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <i class="fas fa-file"></i> <%= att.OriginalName %>
+                                        <small class="text-muted">(<%= (att.Size / 1024).toFixed(2) %> KB)</small>
+                                    </div>
+                                    <a href="<%= att.url %>" class="btn btn-sm btn-primary">
+                                        <i class="fas fa-download"></i> הורד
+                                    </a>
+                                </div>
+                            <% }); %>
+                        </div>
+                    </div>
+                </div>
+            <% } %>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card shadow-md mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-cog"></i> פעולות</h5>
+                </div>
+                <div class="card-body">
+                    <button class="btn btn-primary w-100 mb-2" data-bs-toggle="modal" data-bs-target="#editModal">
+                        <i class="fas fa-edit"></i> ערוך
+                    </button>
+                    <a href="/connections/item/<%= encodeURIComponent(computer.Name || computer.name) %>" class="btn btn-info w-100 mb-2 text-white">
+                        <i class="fas fa-project-diagram"></i> קשרים
+                    </a>
+                    <button class="btn btn-danger w-100" onclick="deleteComputer('<%= computer.Name || computer.name %>')">
+                        <i class="fas fa-trash"></i> מחק
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Connections -->
+            <% if (connections && connections.length > 0) { %>
+                <div class="card shadow-md">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-link"></i> קשרים</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group">
+                            <% connections.slice(0, 5).forEach(conn => { %>
+                                <li class="list-group-item">
+                                    <a href="/datablocks?search=<%= encodeURIComponent(conn.otherItem) %>">
+                                        <%= conn.otherItem %>
+                                    </a>
+                                </li>
+                            <% }); %>
+                        </ul>
+                    </div>
+                </div>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-edit"></i> ערוך מחשב</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="/computers/<%= encodeURIComponent(computer.Name || computer.name) %>/update">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">מערכת הפעלה</label>
+                            <input type="text" name="os" class="form-control" value="<%= computer.f3 || '' %>">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">סטטוס</label>
+                            <select name="status" class="form-control">
+                                <option value="Active" <%= computer.f1 === 'Active' ? 'selected' : '' %>>פעיל</option>
+                                <option value="Inactive" <%= computer.f1 === 'Inactive' ? 'selected' : '' %>>לא פעיל</option>
+                                <option value="Maintenance" <%= computer.f1 === 'Maintenance' ? 'selected' : '' %>>תחזוקה</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">מעבד (CPU)</label>
+                            <input type="text" name="cpu" class="form-control" value="<%= computer.f4 || '' %>">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">זיכרון (RAM)</label>
+                            <input type="text" name="ram" class="form-control" value="<%= computer.f5 || '' %>">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">דיסק קשיח (HDD)</label>
+                            <input type="text" name="hdd" class="form-control" value="<%= computer.f7 || '' %>">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">כתובת IP</label>
+                            <input type="text" name="ip" class="form-control" value="<%= computer.f8 || '' %>">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">מיקום</label>
+                            <input type="text" name="location" class="form-control" value="<%= computer.f2 || '' %>">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">משתמש מוקצה</label>
+                            <input type="text" name="user" class="form-control" value="<%= computer.f9 || '' %>">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">דגם</label>
+                        <input type="text" name="model" class="form-control" value="<%= computer.f10 || '' %>">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">תיאור</label>
+                        <textarea name="description" class="form-control" rows="3"><%= computer.f11 || '' %></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                    <button type="submit" class="btn btn-primary">שמור</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function deleteComputer(name) {
+    if (confirm('האם אתה בטוח שברצונך למחוק את המחשב?')) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/computers/${encodeURIComponent(name)}/delete`;
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+</script>
+` }) %>
+

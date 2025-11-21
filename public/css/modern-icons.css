@@ -1,0 +1,108 @@
+/**
+ * Modern Icons Styling
+ * Professional icon enhancements
+ */
+
+/* Icon sizes */
+.fa-xs { font-size: 0.75rem; }
+.fa-sm { font-size: 0.875rem; }
+.fa-lg { font-size: 1.25rem; }
+.fa-xl { font-size: 1.5rem; }
+.fa-2x { font-size: 2rem; }
+.fa-3x { font-size: 3rem; }
+.fa-4x { font-size: 4rem; }
+
+/* Icon colors */
+.fa-primary { color: var(--primary-color); }
+.fa-success { color: var(--success-color); }
+.fa-danger { color: var(--danger-color); }
+.fa-warning { color: var(--warning-color); }
+.fa-info { color: var(--info-color); }
+
+/* Icon animations */
+.fa-spin-slow {
+    animation: fa-spin 3s infinite linear;
+}
+
+.fa-pulse {
+    animation: fa-pulse 2s infinite;
+}
+
+/* Icon with background */
+.icon-bg {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.icon-bg-success {
+    background: linear-gradient(135deg, var(--success-color) 0%, #059669 100%);
+}
+
+.icon-bg-danger {
+    background: linear-gradient(135deg, var(--danger-color) 0%, #dc2626 100%);
+}
+
+.icon-bg-warning {
+    background: linear-gradient(135deg, var(--warning-color) 0%, #d97706 100%);
+}
+
+.icon-bg-info {
+    background: linear-gradient(135deg, var(--info-color) 0%, #2563eb 100%);
+}
+
+/* Icon hover effects */
+.icon-hover {
+    transition: all 0.3s ease;
+}
+
+.icon-hover:hover {
+    transform: scale(1.2) rotate(5deg);
+    color: var(--primary-color);
+}
+
+/* Icon in buttons */
+.btn i {
+    font-size: 1rem;
+}
+
+.btn-lg i {
+    font-size: 1.25rem;
+}
+
+.btn-sm i {
+    font-size: 0.875rem;
+}
+
+/* Icon spacing */
+i + span, span + i {
+    margin-left: 0.5rem;
+}
+
+/* Feature icons */
+.feature-icon {
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    margin: 0 auto 1.5rem;
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.feature-icon:hover {
+    transform: translateY(-5px) scale(1.1);
+    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+}
+

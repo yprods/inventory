@@ -1,0 +1,70 @@
+<%- include('../layout', { title: 'תוצאות ייבוא', content: `
+<div class="container mt-4 fade-in">
+    <h1 class="display-5 fw-bold mb-4">
+        <i class="fas fa-check-circle text-success"></i> תוצאות ייבוא
+    </h1>
+    
+    <div class="card shadow-lg">
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card bg-primary text-white">
+                        <div class="card-body text-center">
+                            <h3><%= results.total %></h3>
+                            <p class="mb-0">סה"כ רשומות</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-success text-white">
+                        <div class="card-body text-center">
+                            <h3><%= results.success %></h3>
+                            <p class="mb-0">הצליחו</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-danger text-white">
+                        <div class="card-body text-center">
+                            <h3><%= results.failed %></h3>
+                            <p class="mb-0">נכשלו</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-info text-white">
+                        <div class="card-body text-center">
+                            <h3><%= ((results.success / results.total) * 100).toFixed(1) %>%</h3>
+                            <p class="mb-0">אחוז הצלחה</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <% if (results.errors && results.errors.length > 0) { %>
+                <div class="alert alert-warning">
+                    <h5><i class="fas fa-exclamation-triangle"></i> שגיאות:</h5>
+                    <ul class="mb-0">
+                        <% results.errors.slice(0, 10).forEach(err => { %>
+                            <li>שורה <%= err.row %>: <%= err.error %></li>
+                        <% }); %>
+                        <% if (results.errors.length > 10) { %>
+                            <li>...ועוד <%= results.errors.length - 10 %> שגיאות</li>
+                        <% } %>
+                    </ul>
+                </div>
+            <% } %>
+            
+            <div class="mt-4">
+                <a href="/import" class="btn btn-primary">
+                    <i class="fas fa-arrow-right"></i> חזרה לייבוא
+                </a>
+                <a href="/home" class="btn btn-secondary">
+                    <i class="fas fa-home"></i> דף הבית
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+` }) %>
+

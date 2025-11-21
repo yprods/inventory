@@ -1,0 +1,61 @@
+<%- include('../layout', { title: 'חיפוש מתקדם', content: `
+<div class="container mt-4">
+    <h1><i class="fas fa-search"></i> חיפוש מתקדם</h1>
+    
+    <form method="GET" action="/search" class="mb-4">
+        <div class="input-group input-group-lg">
+            <input type="text" name="q" class="form-control" 
+                   placeholder="הקלד לחיפוש..." 
+                   value="<%= typeof query !== 'undefined' ? query : '' %>"
+                   autofocus>
+            <button class="btn btn-primary" type="submit">
+                <i class="fas fa-search"></i> חפש
+            </button>
+        </div>
+    </form>
+    
+    <% if (typeof error !== 'undefined' && error) { %>
+        <div class="alert alert-danger"><%= error %></div>
+    <% } %>
+    
+    <% if (typeof results !== 'undefined' && results.length > 0) { %>
+        <div class="card">
+            <div class="card-header">
+                <h5>תוצאות חיפוש: <%= results.length %></h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>שם</th>
+                                <th>CI_ID</th>
+                                <th>פעולות</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% results.forEach(item => { %>
+                                <tr>
+                                    <td><%= item.Name || item.name || '' %></td>
+                                    <td><%= item.CI_ID || '' %></td>
+                                    <td>
+                                        <a href="/datablocks?search=<%= encodeURIComponent(item.Name || item.name || '') %>" 
+                                           class="btn btn-sm btn-primary">
+                                            <i class="fas fa-eye"></i> צפה
+                                        </a>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    <% } else if (typeof query !== 'undefined' && query) { %>
+        <div class="alert alert-info">
+            לא נמצאו תוצאות עבור '<%= query %>'
+        </div>
+    <% } %>
+</div>
+` }) %>
+

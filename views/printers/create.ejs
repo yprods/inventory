@@ -1,0 +1,63 @@
+<%- include('../layout', { title: 'יצירת מדפסת חדשה', content: `
+<div class="container mt-4 fade-in">
+    <h1 class="display-5 fw-bold mb-4">
+        <i class="fas fa-print text-primary"></i> יצירת מדפסת חדשה
+    </h1>
+    
+    <% if (typeof error !== 'undefined' && error) { %>
+        <div class="alert alert-danger"><%= error %></div>
+    <% } %>
+    
+    <div class="card shadow-lg">
+        <div class="card-body p-4">
+            <form method="POST" action="/printers/create">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label"><i class="fas fa-tag"></i> שם המדפסת *</label>
+                        <input type="text" name="name" class="form-control" required autofocus>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label"><i class="fas fa-info-circle"></i> דגם</label>
+                        <input type="text" name="model" class="form-control">
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label"><i class="fas fa-network-wired"></i> כתובת IP</label>
+                        <input type="text" name="ip" class="form-control" placeholder="192.168.1.100">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label"><i class="fas fa-map-marker-alt"></i> מיקום</label>
+                        <input type="text" name="location" class="form-control">
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label"><i class="fas fa-info-circle"></i> סטטוס</label>
+                        <select name="status" class="form-control">
+                            <option value="Active">פעיל</option>
+                            <option value="Inactive">לא פעיל</option>
+                            <option value="Maintenance">תחזוקה</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label"><i class="fas fa-align-right"></i> תיאור</label>
+                    <textarea name="description" class="form-control" rows="4"></textarea>
+                </div>
+                
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-save"></i> שמור מדפסת
+                    </button>
+                    <a href="/printers" class="btn btn-secondary btn-lg">ביטול</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+` }) %>
+

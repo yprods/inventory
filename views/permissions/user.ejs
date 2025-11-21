@@ -1,0 +1,97 @@
+<%- include('../layout', { title: `הרשאות - ${user?.Username || 'User'}`, content: `
+<div class="container mt-4 fade-in">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="display-5 fw-bold">
+            <i class="fas fa-shield-alt text-primary"></i> הרשאות - <%= user?.Username || 'User' %>
+        </h1>
+        <a href="/permissions" class="btn btn-secondary">
+            <i class="fas fa-arrow-right"></i> חזרה לרשימה
+        </a>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-info-circle"></i> פרטי משתמש</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>שם משתמש:</strong>
+                            <p><%= user?.Username || '-' %></p>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>שם תצוגה:</strong>
+                            <p><%= user?.DisplayName || user?.Username || '-' %></p>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>אימייל:</strong>
+                            <p><%= user?.Email || '-' %></p>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>מחלקה:</strong>
+                            <p><%= user?.Department || '-' %></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card shadow-lg mt-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-key"></i> הרשאות נוכחיות</h5>
+                </div>
+                <div class="card-body">
+                    <% if (permissions && permissions.length > 0) { %>
+                        <div class="d-flex flex-wrap gap-2">
+                            <% permissions.forEach(perm => { %>
+                                <span class="badge bg-success"><%= perm %></span>
+                            <% }); %>
+                        </div>
+                    <% } else { %>
+                        <p class="text-muted">אין הרשאות</p>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card shadow-lg">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-edit"></i> ערוך הרשאות</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="/permissions/user/<%= encodeURIComponent(user?.Username || '') %>">
+                        <div class="mb-3">
+                            <label class="form-label">תפקידים</label>
+                            <% roles.forEach(role => { %>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="roles" value="<%= role.Id %>" 
+                                           id="role_<%= role.Id %>"
+                                           <%= user?.Roles && user.Roles.includes(role.Id) ? 'checked' : '' %>>
+                                    <label class="form-check-label" for="role_<%= role.Id %>">
+                                        <%= role.Name %>
+                                    </label>
+                                </div>
+                            <% }); %>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">הרשאות נוספות (מופרדות בפסיק)</label>
+                            <input type="text" name="permissions" class="form-control" 
+                                   placeholder="computers.edit, printers.delete, ...">
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-save"></i> שמור
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+` }) %>
+

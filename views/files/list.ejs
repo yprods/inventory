@@ -1,0 +1,52 @@
+<%- include('../layout', { title: 'רשימת קבצים', content: `
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="fas fa-folder"></i> רשימת קבצים</h1>
+        <a href="/files/upload" class="btn btn-primary">
+            <i class="fas fa-upload"></i> העלה קובץ חדש
+        </a>
+    </div>
+    
+    <% if (typeof error !== 'undefined' && error) { %>
+        <div class="alert alert-danger"><%= error %></div>
+    <% } %>
+    
+    <% if (typeof files !== 'undefined' && files.length > 0) { %>
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>שם קובץ</th>
+                                <th>גודל</th>
+                                <th>תאריך שינוי</th>
+                                <th>פעולות</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% files.forEach(file => { %>
+                                <tr>
+                                    <td><%= file.name %></td>
+                                    <td><%= (file.size / 1024).toFixed(2) %> KB</td>
+                                    <td><%= new Date(file.modified).toLocaleString('he-IL') %></td>
+                                    <td>
+                                        <a href="<%= file.url %>" class="btn btn-sm btn-primary" target="_blank">
+                                            <i class="fas fa-download"></i> הורד
+                                        </a>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    <% } else { %>
+        <div class="alert alert-info">
+            אין קבצים מועלים
+        </div>
+    <% } %>
+</div>
+` }) %>
+

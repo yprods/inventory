@@ -1,0 +1,108 @@
+<%- include('../layout', { title: 'ספקים', content: `
+<div class="container-fluid mt-4 fade-in">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="display-5 fw-bold">
+            <i class="fas fa-truck text-primary"></i> ספקים
+        </h1>
+        <a href="/suppliers/create" class="btn btn-primary btn-lg">
+            <i class="fas fa-plus-circle"></i> הוסף ספק חדש
+        </a>
+    </div>
+    
+    <!-- Search and Filters -->
+    <div class="card shadow-md mb-4">
+        <div class="card-body">
+            <form method="GET" action="/suppliers" class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label"><i class="fas fa-search"></i> חיפוש</label>
+                    <input type="text" name="search" class="form-control" value="<%= search %>" placeholder="חפש ספק...">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label"><i class="fas fa-folder"></i> קטגוריה</label>
+                    <select name="category" class="form-control">
+                        <option value="">הכל</option>
+                        <% categories.forEach(cat => { %>
+                            <option value="<%= cat.category %>" <%= category === cat.category ? 'selected' : '' %>>
+                                <%= cat.category %>
+                            </option>
+                        <% }); %>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label"><i class="fas fa-info-circle"></i> סטטוס</label>
+                    <select name="status" class="form-control">
+                        <option value="">הכל</option>
+                        <option value="Active" <%= status === 'Active' ? 'selected' : '' %>>פעיל</option>
+                        <option value="Inactive" <%= status === 'Inactive' ? 'selected' : '' %>>לא פעיל</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">&nbsp;</label>
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search"></i> חפש
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <% if (typeof error !== 'undefined' && error) { %>
+        <div class="alert alert-danger"><%= error %></div>
+    <% } %>
+    
+    <!-- Suppliers Grid -->
+    <% if (suppliers && suppliers.length > 0) { %>
+        <div class="row g-4">
+            <% suppliers.forEach(supplier => { %>
+                <div class="col-md-4">
+                    <div class="card shadow-md h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <h5 class="card-title fw-bold">
+                                        <i class="fas fa-truck text-primary"></i> <%= supplier.Name || supplier.name || supplier.f0 || 'ללא שם' %>
+                                    </h5>
+                                    <p class="text-muted mb-0">
+                                        <i class="fas fa-tag"></i> <%= supplier.f1 || 'ללא קטגוריה' %>
+                                    </p>
+                                </div>
+                                <span class="badge bg-<%= supplier.f2 === 'Active' ? 'success' : 'secondary' %>">
+                                    <%= supplier.f2 || 'Unknown' %>
+                                </span>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <% if (supplier.f3) { %>
+                                    <p class="mb-1"><i class="fas fa-user text-muted"></i> <%= supplier.f3 %></p>
+                                <% } %>
+                                <% if (supplier.f4) { %>
+                                    <p class="mb-1"><i class="fas fa-phone text-muted"></i> <%= supplier.f4 %></p>
+                                <% } %>
+                                <% if (supplier.f5) { %>
+                                    <p class="mb-1"><i class="fas fa-envelope text-muted"></i> <%= supplier.f5 %></p>
+                                <% } %>
+                            </div>
+                            
+                            <a href="/suppliers/<%= encodeURIComponent(supplier.Name || supplier.name || supplier.CI_ID) %>" class="btn btn-outline-primary w-100">
+                                <i class="fas fa-eye"></i> צפה בפרטים
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            <% }); %>
+        </div>
+    <% } else { %>
+        <div class="card shadow-md">
+            <div class="card-body text-center py-5">
+                <i class="fas fa-truck fa-4x text-muted mb-3"></i>
+                <h4>אין ספקים</h4>
+                <p class="text-muted">לא נמצאו ספקים במערכת</p>
+                <a href="/suppliers/create" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> הוסף ספק ראשון
+                </a>
+            </div>
+        </div>
+    <% } %>
+</div>
+` }) %>
+

@@ -1,0 +1,157 @@
+<%- include('../layout', { title: 'דף הבית', content: `
+<div class="container mt-4 fade-in">
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold mb-3">
+            <i class="fas fa-book-open text-primary"></i> ברוך הבא לספר מערכת
+        </h1>
+        <p class="lead text-muted">מערכת ניהול מרכזית מתקדמת</p>
+    </div>
+    
+    <div class="row g-4 mt-4">
+        <div class="col-md-4">
+            <div class="card h-100 shadow-lg">
+                <div class="card-body text-center p-4">
+                    <div class="mb-3">
+                        <i class="fas fa-search fa-3x text-primary"></i>
+                    </div>
+                    <h4 class="card-title fw-bold mb-3">חיפוש מתקדם</h4>
+                    <p class="text-muted mb-4">חפש בכל הפריטים והשדות במערכת</p>
+                    <form action="/datablocks" method="GET" class="mb-3">
+                        <div class="input-group">
+                            <input type="text" name="search" class="form-control" placeholder="הקלד לחיפוש...">
+                            <button class="btn btn-primary" type="submit">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </form>
+                    <a href="/deepsearch" class="btn btn-outline-primary w-100">
+                        <i class="fas fa-search-plus"></i> חיפוש עמוק
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card h-100 shadow-lg">
+                <div class="card-body text-center p-4">
+                    <div class="mb-3">
+                        <i class="fas fa-comments fa-3x text-success"></i>
+                    </div>
+                    <h4 class="card-title fw-bold mb-3">צ'אט צוות</h4>
+                    <p class="text-muted mb-4">תקשורת בזמן אמת עם הצוות</p>
+                    <a href="/chat" class="btn btn-success w-100">
+                        <i class="fas fa-comments"></i> פתח צ'אט
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card h-100 shadow-lg">
+                <div class="card-body text-center p-4">
+                    <div class="mb-3">
+                        <i class="fas fa-plus-circle fa-3x text-info"></i>
+                    </div>
+                    <h4 class="card-title fw-bold mb-3">יצירת פריט</h4>
+                    <p class="text-muted mb-4">צור פריט חדש עם כל השדות</p>
+                    <a href="/create" class="btn btn-info w-100 text-white">
+                        <i class="fas fa-plus"></i> צור פריט חדש
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row g-4 mt-2">
+        <div class="col-md-3">
+            <div class="card shadow-md h-100">
+                <div class="card-body text-center p-4">
+                    <div class="mb-3">
+                        <i class="fas fa-desktop fa-3x text-primary"></i>
+                    </div>
+                    <h5 class="card-title fw-bold mb-3">מחשבים</h5>
+                    <p class="text-muted mb-3">ניהול מחשבים במערכת</p>
+                    <a href="/computers" class="btn btn-outline-primary w-100">
+                        <i class="fas fa-desktop"></i> פתח
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card shadow-md h-100">
+                <div class="card-body text-center p-4">
+                    <div class="mb-3">
+                        <i class="fas fa-print fa-3x text-success"></i>
+                    </div>
+                    <h5 class="card-title fw-bold mb-3">מדפסות</h5>
+                    <p class="text-muted mb-3">ניהול מדפסות במערכת</p>
+                    <a href="/printers" class="btn btn-outline-success w-100">
+                        <i class="fas fa-print"></i> פתח
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card shadow-md h-100">
+                <div class="card-body text-center p-4">
+                    <div class="mb-3">
+                        <i class="fas fa-store fa-3x text-info"></i>
+                    </div>
+                    <h5 class="card-title fw-bold mb-3">חנות אפליקציות</h5>
+                    <p class="text-muted mb-3">גלוש והתקן אפליקציות</p>
+                    <a href="/appstore" class="btn btn-outline-info w-100 text-white">
+                        <i class="fas fa-store"></i> פתח
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card shadow-md h-100">
+                <div class="card-body text-center p-4">
+                    <div class="mb-3">
+                        <i class="fas fa-project-diagram fa-3x text-warning"></i>
+                    </div>
+                    <h5 class="card-title fw-bold mb-3">מפת קשרים</h5>
+                    <p class="text-muted mb-3">צפה בקשרים בין פריטים</p>
+                    <a href="/connections/map" class="btn btn-outline-warning w-100">
+                        <i class="fas fa-project-diagram"></i> פתח
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row g-4 mt-2">
+        <div class="col-md-6">
+            <div class="card shadow-md">
+                <div class="card-body p-4">
+                    <h5 class="card-title fw-bold mb-3">
+                        <i class="fas fa-bell text-warning"></i> התראות
+                    </h5>
+                    <p class="text-muted mb-3">עקב אחר התראות ועדכונים חשובים</p>
+                    <a href="/alerts" class="btn btn-outline-warning">
+                        <i class="fas fa-bell"></i> צפה בהתראות
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card shadow-md">
+                <div class="card-body p-4">
+                    <h5 class="card-title fw-bold mb-3">
+                        <i class="fas fa-folder-open text-secondary"></i> קבצים
+                    </h5>
+                    <p class="text-muted mb-3">ניהול קבצים במערכת</p>
+                    <a href="/files/list" class="btn btn-outline-secondary">
+                        <i class="fas fa-folder-open"></i> פתח
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+` }) %>

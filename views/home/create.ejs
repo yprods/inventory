@@ -1,0 +1,111 @@
+<%- include('../layout', { title: 'יצירת פריט חדש', content: `
+<div class="container mt-4">
+    <h1>יצירת פריט חדש</h1>
+    
+    <% if (typeof error !== 'undefined' && error) { %>
+        <div class="alert alert-danger"><%= error %></div>
+    <% } %>
+    
+    <form method="POST" action="/create" class="mt-4" id="createForm">
+        <div class="card">
+            <div class="card-header">
+                <h5>פרטים בסיסיים</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label for="search" class="form-label">שם הפריט *</label>
+                    <input type="text" class="form-control" id="search" name="search" value="<%= typeof search !== 'undefined' ? search : '' %>" required>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="itemType" class="form-label">סוג פריט</label>
+                    <select class="form-control" id="itemType" name="itemType">
+                        <option value="CI">CI</option>
+                        <option value="Server">שרת</option>
+                        <option value="Computer">מחשב</option>
+                        <option value="User">משתמש</option>
+                        <option value="Network">רשת</option>
+                        <option value="Application">אפליקציה</option>
+                        <option value="Other">אחר</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5>שדות נתונים (f0-f50)</h5>
+                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="toggleAllFields()">
+                    <i class="fas fa-eye"></i> הצג/הסתר הכל
+                </button>
+            </div>
+            <div class="card-body">
+                <div class="row" id="fieldsContainer">
+                    <% for (let i = 0; i <= 50; i++) { %>
+                        <div class="col-md-6 mb-3 field-row" style="display: none;">
+                            <label for="f<%= i %>" class="form-label">f<%= i %></label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="f<%= i %>" 
+                                   name="fieldValues[<%= i %>]" 
+                                   placeholder="שדה <%= i %>">
+                        </div>
+                    <% } %>
+                </div>
+                <div class="mt-3">
+                    <button type="button" class="btn btn-sm btn-primary" onclick="showMoreFields()">
+                        <i class="fas fa-plus"></i> הצג עוד שדות
+                    </button>
+                    <span id="fieldsShown">0 / 51 שדות מוצגים</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-4">
+            <button type="submit" class="btn btn-primary btn-lg">
+                <i class="fas fa-save"></i> צור פריט
+            </button>
+            <a href="/home" class="btn btn-secondary btn-lg">ביטול</a>
+        </div>
+    </form>
+</div>
+
+<script>
+let fieldsShown = 0;
+const totalFields = 51;
+
+function showMoreFields() {
+    const hiddenFields = document.querySelectorAll('.field-row[style*="display: none"]');
+    const toShow = Math.min(10, hiddenFields.length);
+    
+    for (let i = 0; i < toShow; i++) {
+        hiddenFields[i].style.display = 'block';
+        fieldsShown++;
+    }
+    
+    updateFieldsCounter();
+}
+
+function toggleAllFields() {
+    const allFields = document.querySelectorAll('.field-row');
+    const allHidden = Array.from(allFields).every(f => f.style.display === 'none');
+    
+    allFields.forEach(field => {
+        field.style.display = allHidden ? 'block' : 'none';
+    });
+    
+    fieldsShown = allHidden ? totalFields : 0;
+    updateFieldsCounter();
+}
+
+function updateFieldsCounter() {
+    document.getElementById('fieldsShown').textContent = `${fieldsShown} / ${totalFields} שדות מוצגים`;
+}
+
+// Show first 5 fields by default
+document.addEventListener('DOMContentLoaded', function() {
+    showMoreFields();
+    showMoreFields();
+});
+</script>
+` }) %>

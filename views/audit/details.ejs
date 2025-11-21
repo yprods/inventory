@@ -1,0 +1,67 @@
+<%- include('../layout', { title: `פרטי ביקורת - ${log.Id}`, content: `
+<div class="container mt-4 fade-in">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="display-5 fw-bold">
+            <i class="fas fa-clipboard-list text-primary"></i> פרטי ביקורת #<%= log.Id %>
+        </h1>
+        <a href="/audit" class="btn btn-secondary">
+            <i class="fas fa-arrow-right"></i> חזרה לרשימה
+        </a>
+    </div>
+    
+    <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="fas fa-info-circle"></i> פרטי פעולה</h5>
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <strong><i class="fas fa-user"></i> משתמש:</strong>
+                    <p><%= log.UserName %></p>
+                </div>
+                <div class="col-md-6">
+                    <strong><i class="fas fa-tasks"></i> פעולה:</strong>
+                    <p><span class="badge bg-primary"><%= log.Action %></span></p>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <strong><i class="fas fa-tag"></i> סוג ישות:</strong>
+                    <p><%= log.EntityType || '-' %></p>
+                </div>
+                <div class="col-md-6">
+                    <strong><i class="fas fa-id-card"></i> ID ישות:</strong>
+                    <p><%= log.EntityId || '-' %></p>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <strong><i class="fas fa-file"></i> שם ישות:</strong>
+                    <p><%= log.EntityName || '-' %></p>
+                </div>
+                <div class="col-md-6">
+                    <strong><i class="fas fa-calendar"></i> תאריך/שעה:</strong>
+                    <p><%= new Date(log.CreatedAt).toLocaleString('he-IL') %></p>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <strong><i class="fas fa-network-wired"></i> כתובת IP:</strong>
+                    <p><%= log.IpAddress || '-' %></p>
+                </div>
+                <div class="col-md-6">
+                    <strong><i class="fas fa-desktop"></i> User Agent:</strong>
+                    <p><small class="text-muted"><%= log.UserAgent || '-' %></small></p>
+                </div>
+            </div>
+            <% if (log.Details) { %>
+                <div class="mb-3">
+                    <strong><i class="fas fa-align-right"></i> פרטים נוספים:</strong>
+                    <pre class="bg-light p-3 rounded"><%= JSON.stringify(log.Details, null, 2) %></pre>
+                </div>
+            <% } %>
+        </div>
+    </div>
+</div>
+` }) %>
+

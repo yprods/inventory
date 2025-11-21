@@ -1,0 +1,256 @@
+<%- include('../layout', { title: `${app.Name || app.name} - חנות אפליקציות`, content: `
+<div class="container mt-4 fade-in">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="display-5 fw-bold">
+            <i class="fas fa-mobile-alt text-primary"></i> <%= app.Name || app.name %>
+        </h1>
+        <div>
+            <a href="/appstore" class="btn btn-secondary">
+                <i class="fas fa-arrow-right"></i> חזרה לחנות
+            </a>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-lg mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-info-circle"></i> פרטי אפליקציה</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong><i class="fas fa-code"></i> מפתח:</strong>
+                            <p><%= app.f3 || 'לא צוין' %></p>
+                        </div>
+                        <div class="col-md-6">
+                            <strong><i class="fas fa-tag"></i> קטגוריה:</strong>
+                            <p><span class="badge bg-primary"><%= app.f1 || 'ללא קטגוריה' %></span></p>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong><i class="fas fa-info-circle"></i> גרסה:</strong>
+                            <p><%= app.f2 || '1.0.0' %></p>
+                        </div>
+                        <div class="col-md-6">
+                            <strong><i class="fas fa-<%= app.f9 === 'Free' ? 'gift' : 'dollar-sign' %>"></i> רישיון:</strong>
+                            <p><span class="badge bg-<%= app.f9 === 'Free' ? 'success' : 'warning' %>"><%= app.f9 || 'Free' %></span></p>
+                            <% if (app.f4 && app.f4 !== '0') { %>
+                                <p class="mt-2"><strong>מחיר:</strong> ₪<%= app.f4 %></p>
+                            <% } %>
+                        </div>
+                    </div>
+                    <% if (app.f5) { %>
+                        <div class="mb-3">
+                            <strong><i class="fas fa-align-right"></i> תיאור:</strong>
+                            <p><%= app.f5 %></p>
+                        </div>
+                    <% } %>
+                    <% if (app.f7) { %>
+                        <div class="mb-3">
+                            <strong><i class="fas fa-download"></i> קישור להורדה:</strong>
+                            <p><a href="<%= app.f7 %>" target="_blank" class="btn btn-primary btn-sm">
+                                <i class="fas fa-external-link-alt"></i> הורד
+                            </a></p>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+            
+            <!-- Attachments -->
+            <% if (attachments && attachments.length > 0) { %>
+                <div class="card shadow-md mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-paperclip"></i> קבצים מצורפים</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="list-group">
+                            <% attachments.forEach(att => { %>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <i class="fas fa-file"></i> <%= att.OriginalName %>
+                                        <small class="text-muted">(<%= (att.Size / 1024).toFixed(2) %> KB)</small>
+                                    </div>
+                                    <a href="<%= att.url %>" class="btn btn-sm btn-primary">
+                                        <i class="fas fa-download"></i> הורד
+                                    </a>
+                                </div>
+                            <% }); %>
+                        </div>
+                    </div>
+                </div>
+            <% } %>
+        </div>
+        
+        <div class="col-md-4">
+            <% if (app.f8) { %>
+                <div class="card shadow-md mb-4">
+                    <div class="card-body text-center">
+                        <img src="<%= app.f8 %>" alt="<%= app.Name || app.name %>" class="img-fluid" style="max-height: 200px; object-fit: contain;">
+                    </div>
+                </div>
+            <% } %>
+            
+            <div class="card shadow-md mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-cog"></i> פעולות</h5>
+                </div>
+                <div class="card-body">
+                    <button class="btn btn-primary w-100 mb-2" data-bs-toggle="modal" data-bs-target="#editModal">
+                        <i class="fas fa-edit"></i> ערוך
+                    </button>
+                    <button class="btn btn-success w-100 mb-2" data-bs-toggle="modal" data-bs-target="#installModal">
+                        <i class="fas fa-download"></i> התקן על מחשב
+                    </button>
+                    <a href="/connections/item/<%= encodeURIComponent(app.Name || app.name) %>" class="btn btn-info w-100 mb-2 text-white">
+                        <i class="fas fa-project-diagram"></i> קשרים
+                    </a>
+                    <button class="btn btn-danger w-100" onclick="deleteApp('<%= app.Name || app.name %>')">
+                        <i class="fas fa-trash"></i> מחק
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Connections -->
+            <% if (connections && connections.length > 0) { %>
+                <div class="card shadow-md">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-link"></i> קשרים</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group">
+                            <% connections.slice(0, 5).forEach(conn => { %>
+                                <li class="list-group-item">
+                                    <a href="/datablocks?search=<%= encodeURIComponent(conn.otherItem) %>">
+                                        <%= conn.otherItem %>
+                                    </a>
+                                </li>
+                            <% }); %>
+                        </ul>
+                    </div>
+                </div>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-edit"></i> ערוך אפליקציה</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="/appstore/<%= encodeURIComponent(app.Name || app.name) %>/update">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">קטגוריה</label>
+                        <input type="text" name="category" class="form-control" value="<%= app.f1 || '' %>">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">גרסה</label>
+                        <input type="text" name="version" class="form-control" value="<%= app.f2 || '' %>">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">מפתח</label>
+                        <input type="text" name="developer" class="form-control" value="<%= app.f3 || '' %>">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">מחיר</label>
+                        <input type="text" name="price" class="form-control" value="<%= app.f4 || '0' %>">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">תיאור</label>
+                        <textarea name="description" class="form-control" rows="3"><%= app.f5 || '' %></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">קישור להורדה</label>
+                        <input type="url" name="downloadUrl" class="form-control" value="<%= app.f7 || '' %>">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">קישור לתמונה</label>
+                        <input type="url" name="iconUrl" class="form-control" value="<%= app.f8 || '' %>">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">רישיון</label>
+                        <select name="license" class="form-control">
+                            <option value="Free" <%= app.f9 === 'Free' ? 'selected' : '' %>>חינם</option>
+                            <option value="Paid" <%= app.f9 === 'Paid' ? 'selected' : '' %>>בתשלום</option>
+                            <option value="Trial" <%= app.f9 === 'Trial' ? 'selected' : '' %>>ניסיון</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                    <button type="submit" class="btn btn-primary">שמור</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Install Modal -->
+<div class="modal fade" id="installModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-download"></i> התקן אפליקציה</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="installForm">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">בחר מחשב</label>
+                        <input type="text" name="computerId" class="form-control" placeholder="שם המחשב" required>
+                        <small class="text-muted">הזן את שם המחשב עליו תרצה להתקין את האפליקציה</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                    <button type="submit" class="btn btn-success">התקן</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function deleteApp(name) {
+    if (confirm('האם אתה בטוח שברצונך למחוק את האפליקציה?')) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/appstore/${encodeURIComponent(name)}/delete`;
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+document.getElementById('installForm')?.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    const computerId = formData.get('computerId');
+    
+    try {
+        const response = await fetch(`/appstore/<%= encodeURIComponent(app.Name || app.name) %>/install`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ computerId: computerId })
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+            alert('האפליקציה הותקנה בהצלחה!');
+            bootstrap.Modal.getInstance(document.getElementById('installModal')).hide();
+        } else {
+            alert('שגיאה: ' + (data.error || 'Unknown error'));
+        }
+    } catch (error) {
+        console.error('Install error:', error);
+        alert('שגיאה בהתקנת האפליקציה');
+    }
+});
+</script>
+` }) %>
+

@@ -1,0 +1,25 @@
+/**
+ * Alerts CSS
+ */
+
+.alert-card {
+    transition: all 0.3s ease;
+}
+
+.alert-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.alert-unread {
+    border-left: 4px solid #007bff;
+    background-color: #f8f9fa;
+    font-weight: 500;
+}
+
+#alertsBadge {
+    font-size: 0.7rem;
+    padding: 2px 6px;
+    border-radius: 10px;
+}
+

@@ -1,0 +1,38 @@
+<%- include('../layout', { title: 'ניהול מסד נתונים', content: `
+<div class="container mt-4">
+    <h1><i class="fas fa-database"></i> ניהול מסד נתונים</h1>
+    
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>SQL Server</h5>
+                </div>
+                <div class="card-body">
+                    <p>מסד הנתונים הראשי</p>
+                    <ul>
+                        <li>טבלאות: CI, DATABOX</li>
+                        <li>סטטוס: פעיל</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>SQLite</h5>
+                </div>
+                <div class="card-body">
+                    <p>מסד נתונים לפריטי רשת</p>
+                    <ul>
+                        <li>טבלאות: NetworkItems, NetworkItemRelations</li>
+                        <li>סטטוס: פעיל</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+` }) %>
+

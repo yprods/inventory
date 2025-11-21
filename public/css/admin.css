@@ -1,0 +1,19 @@
+/**
+ * Admin Dashboard CSS
+ */
+
+.admin-stats-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.admin-stats-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.admin-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+

@@ -1,0 +1,135 @@
+<%- include('../layout', { title: 'חיפוש עמוק', content: `
+<div class="container mt-4">
+    <h1><i class="fas fa-search-plus"></i> חיפוש עמוק</h1>
+    
+    <div class="card mt-4">
+        <div class="card-body">
+            <form id="deepSearchForm" onsubmit="performDeepSearch(event)">
+                <div class="row">
+                    <div class="col-md-8">
+                        <input type="text" 
+                               id="searchTerm" 
+                               class="form-control form-control-lg" 
+                               placeholder="הקלד לחיפוש בכל השדות והטבלאות..."
+                               value="<%= typeof query !== 'undefined' ? query : '' %>"
+                               autocomplete="off">
+                        <div id="suggestions" class="list-group mt-2" style="display: none;"></div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="exactMatch">
+                            <label class="form-check-label" for="exactMatch">התאמה מדויקת</label>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-lg w-100 mt-2">
+                            <i class="fas fa-search"></i> חפש
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <% if (typeof error !== 'undefined' && error) { %>
+        <div class="alert alert-danger mt-4"><%= error %></div>
+    <% } %>
+    
+    <% if (typeof results !== 'undefined' && results) { %>
+        <div class="mt-4">
+            <h3>תוצאות חיפוש (<%= results.total %>)</h3>
+            
+            <!-- Items Results -->
+            <% if (results.items && results.items.length > 0) { %>
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h5>פריטים (<%= results.items.length %>)</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>סוג</th>
+                                        <th>שם</th>
+                                        <th>שדות תואמים</th>
+                                        <th>פעולות</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% results.items.forEach(item => { %>
+                                        <tr>
+                                            <td><span class="badge bg-primary"><%= item.type %></span></td>
+                                            <td><strong><%= item.name %></strong></td>
+                                            <td>
+                                                <% if (item.matchFields && item.matchFields.length > 0) { %>
+                                                    <% item.matchFields.slice(0, 3).forEach(match => { %>
+                                                        <span class="badge bg-info"><%= match.field %></span>
+                                                    <% }); %>
+                                                    <% if (item.matchFields.length > 3) { %>
+                                                        <span class="text-muted">+<%= item.matchFields.length - 3 %> עוד</span>
+                                                    <% } %>
+                                                <% } %>
+                                            </td>
+                                            <td>
+                                                <a href="/datablocks?search=<%= encodeURIComponent(item.name) %>" class="btn btn-sm btn-primary">
+                                                    <i class="fas fa-eye"></i> צפה
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    <% }); %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            <% } %>
+            
+            <!-- Connections Results -->
+            <% if (results.connections && results.connections.length > 0) { %>
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h5>קשרים (<%= results.connections.length %>)</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group">
+                            <% results.connections.forEach(conn => { %>
+                                <li class="list-group-item">
+                                    <strong><%= conn.SourceItem %></strong> 
+                                    <i class="fas fa-arrow-left"></i> 
+                                    <strong><%= conn.TargetItem %></strong>
+                                    <span class="badge bg-secondary"><%= conn.ConnectionType %></span>
+                                </li>
+                            <% }); %>
+                        </ul>
+                    </div>
+                </div>
+            <% } %>
+            
+            <!-- Attachments Results -->
+            <% if (results.attachments && results.attachments.length > 0) { %>
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h5>קבצים מצורפים (<%= results.attachments.length %>)</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group">
+                            <% results.attachments.forEach(att => { %>
+                                <li class="list-group-item">
+                                    <i class="fas fa-file"></i> 
+                                    <strong><%= att.OriginalName %></strong>
+                                    <span class="text-muted">- <%= att.ItemName %></span>
+                                    <a href="/api/attachments/download/<%= att.Id %>" class="btn btn-sm btn-primary float-end">
+                                        <i class="fas fa-download"></i> הורד
+                                    </a>
+                                </li>
+                            <% }); %>
+                        </ul>
+                    </div>
+                </div>
+            <% } %>
+        </div>
+    <% } %>
+</div>
+
+<script src="/js/deepSearch.js"></script>
+` }) %>
+

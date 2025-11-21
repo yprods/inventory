@@ -1,0 +1,203 @@
+<%- include('../layout', { title: `ספק - ${supplier.Name || supplier.name}`, content: `
+<div class="container mt-4 fade-in">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="display-5 fw-bold">
+            <i class="fas fa-truck text-primary"></i> <%= supplier.Name || supplier.name %>
+        </h1>
+        <div>
+            <a href="/suppliers" class="btn btn-secondary">
+                <i class="fas fa-arrow-right"></i> חזרה לרשימה
+            </a>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-lg mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-info-circle"></i> פרטי ספק</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong><i class="fas fa-tag"></i> קטגוריה:</strong>
+                            <p><span class="badge bg-primary"><%= supplier.f1 || 'לא צוין' %></span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <strong><i class="fas fa-info-circle"></i> סטטוס:</strong>
+                            <p><span class="badge bg-<%= supplier.f2 === 'Active' ? 'success' : 'secondary' %>"><%= supplier.f2 || 'Unknown' %></span></p>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong><i class="fas fa-user"></i> איש קשר:</strong>
+                            <p><%= supplier.f3 || 'לא צוין' %></p>
+                        </div>
+                        <div class="col-md-6">
+                            <strong><i class="fas fa-phone"></i> טלפון:</strong>
+                            <p>
+                                <% if (supplier.f4) { %>
+                                    <a href="tel:<%= supplier.f4 %>"><%= supplier.f4 %></a>
+                                <% } else { %>
+                                    לא צוין
+                                <% } %>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong><i class="fas fa-envelope"></i> אימייל:</strong>
+                            <p>
+                                <% if (supplier.f5) { %>
+                                    <a href="mailto:<%= supplier.f5 %>"><%= supplier.f5 %></a>
+                                <% } else { %>
+                                    לא צוין
+                                <% } %>
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <strong><i class="fas fa-map-marker-alt"></i> כתובת:</strong>
+                            <p><%= supplier.f7 || 'לא צוין' %></p>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong><i class="fas fa-globe"></i> אתר אינטרנט:</strong>
+                            <p>
+                                <% if (supplier.f8) { %>
+                                    <a href="<%= supplier.f8 %>" target="_blank"><%= supplier.f8 %></a>
+                                <% } else { %>
+                                    לא צוין
+                                <% } %>
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <strong><i class="fas fa-id-card"></i> ח.פ./מס' עוסק:</strong>
+                            <p><%= supplier.f9 || 'לא צוין' %></p>
+                        </div>
+                    </div>
+                    <% if (supplier.f10) { %>
+                        <div class="mb-3">
+                            <strong><i class="fas fa-align-right"></i> הערות:</strong>
+                            <p><%= supplier.f10 %></p>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+            
+            <!-- Orders/Transactions -->
+            <% if (orders && orders.length > 0) { %>
+                <div class="card shadow-md mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-shopping-cart"></i> הזמנות/עסקאות</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group">
+                            <% orders.forEach(order => { %>
+                                <li class="list-group-item">
+                                    <%= order.otherItem %>
+                                    <span class="badge bg-info"><%= order.ConnectionType %></span>
+                                </li>
+                            <% }); %>
+                        </ul>
+                    </div>
+                </div>
+            <% } %>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card shadow-md mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-cog"></i> פעולות</h5>
+                </div>
+                <div class="card-body">
+                    <button class="btn btn-primary w-100 mb-2" data-bs-toggle="modal" data-bs-target="#editModal">
+                        <i class="fas fa-edit"></i> ערוך
+                    </button>
+                    <button class="btn btn-danger w-100" onclick="deleteSupplier('<%= supplier.Name || supplier.name %>')">
+                        <i class="fas fa-trash"></i> מחק
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-edit"></i> ערוך ספק</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="/suppliers/<%= encodeURIComponent(supplier.Name || supplier.name) %>/update">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">קטגוריה</label>
+                            <input type="text" name="category" class="form-control" value="<%= supplier.f1 || '' %>">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">סטטוס</label>
+                            <select name="status" class="form-control">
+                                <option value="Active" <%= supplier.f2 === 'Active' ? 'selected' : '' %>>פעיל</option>
+                                <option value="Inactive" <%= supplier.f2 === 'Inactive' ? 'selected' : '' %>>לא פעיל</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">איש קשר</label>
+                            <input type="text" name="contactPerson" class="form-control" value="<%= supplier.f3 || '' %>">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">טלפון</label>
+                            <input type="tel" name="phone" class="form-control" value="<%= supplier.f4 || '' %>">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">אימייל</label>
+                            <input type="email" name="email" class="form-control" value="<%= supplier.f5 || '' %>">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">אתר אינטרנט</label>
+                            <input type="url" name="website" class="form-control" value="<%= supplier.f8 || '' %>">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">כתובת</label>
+                        <textarea name="address" class="form-control" rows="2"><%= supplier.f7 || '' %></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">ח.פ./מס' עוסק</label>
+                        <input type="text" name="taxId" class="form-control" value="<%= supplier.f9 || '' %>">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">הערות</label>
+                        <textarea name="notes" class="form-control" rows="3"><%= supplier.f10 || '' %></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                    <button type="submit" class="btn btn-primary">שמור</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function deleteSupplier(name) {
+    if (confirm('האם אתה בטוח שברצונך למחוק את הספק?')) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/suppliers/${encodeURIComponent(name)}/delete`;
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+</script>
+` }) %>
+

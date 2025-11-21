@@ -1,0 +1,78 @@
+<%- include('../layout', { title: 'הוספת אפליקציה חדשה', content: `
+<div class="container mt-4 fade-in">
+    <h1 class="display-5 fw-bold mb-4">
+        <i class="fas fa-store text-primary"></i> הוספת אפליקציה חדשה
+    </h1>
+    
+    <% if (typeof error !== 'undefined' && error) { %>
+        <div class="alert alert-danger"><%= error %></div>
+    <% } %>
+    
+    <div class="card shadow-lg">
+        <div class="card-body p-4">
+            <form method="POST" action="/appstore/create">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label"><i class="fas fa-tag"></i> שם האפליקציה *</label>
+                        <input type="text" name="name" class="form-control" required autofocus>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label"><i class="fas fa-folder"></i> קטגוריה</label>
+                        <input type="text" name="category" class="form-control" placeholder="Productivity, Games, Tools...">
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label"><i class="fas fa-info-circle"></i> גרסה</label>
+                        <input type="text" name="version" class="form-control" value="1.0.0">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label"><i class="fas fa-code"></i> מפתח</label>
+                        <input type="text" name="developer" class="form-control">
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label"><i class="fas fa-dollar-sign"></i> מחיר</label>
+                        <input type="text" name="price" class="form-control" value="0" placeholder="0 לחינם">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label"><i class="fas fa-key"></i> רישיון</label>
+                        <select name="license" class="form-control">
+                            <option value="Free">חינם</option>
+                            <option value="Paid">בתשלום</option>
+                            <option value="Trial">ניסיון</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label"><i class="fas fa-align-right"></i> תיאור</label>
+                    <textarea name="description" class="form-control" rows="4"></textarea>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label"><i class="fas fa-download"></i> קישור להורדה</label>
+                        <input type="url" name="downloadUrl" class="form-control" placeholder="https://...">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label"><i class="fas fa-image"></i> קישור לתמונה/אייקון</label>
+                        <input type="url" name="iconUrl" class="form-control" placeholder="https://...">
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-save"></i> שמור אפליקציה
+                    </button>
+                    <a href="/appstore" class="btn btn-secondary btn-lg">ביטול</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+` }) %>
+
