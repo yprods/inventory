@@ -1,35 +1,57 @@
 <!DOCTYPE html>
-<html dir="rtl" lang="he-il">
+<html lang="he" dir="rtl">
 <head>
-    <meta charset="utf-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>אימות PIN - ספר מערכת</title>
+    <title>אימות PIN</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="/css/auth.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .pin-card {
+            background: white;
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 400px;
+            width: 100%;
+        }
+    </style>
 </head>
-<body class="auth-page">
-    <div class="auth-container">
-        <div class="auth-card">
-            <h1 class="text-center mb-4">ספר מערכת</h1>
-            <h2 class="text-center mb-4">אימות PIN</h2>
-            
-            <% if (typeof error !== 'undefined' && error) { %>
-                <div class="alert alert-danger"><%= error %></div>
-            <% } %>
-            
-            <form action="/auth/pin" method="POST">
-                <div class="mb-3">
-                    <label for="pin" class="form-label">הזן PIN</label>
-                    <input type="password" class="form-control form-control-lg" id="pin" name="pin" required autofocus>
-                </div>
-                <button type="submit" class="btn btn-primary w-100 btn-lg">אימות</button>
-            </form>
-            
-            <div class="text-center mt-3">
-                <a href="/auth/login">חזור להתחברות</a>
-            </div>
+<body>
+    <div class="pin-card">
+        <div class="text-center mb-4">
+            <i class="fas fa-key fa-3x text-primary mb-3"></i>
+            <h2>אימות PIN</h2>
         </div>
+        
+        <% if (error) { %>
+            <div class="alert alert-danger"><%= error %></div>
+        <% } %>
+        
+        <form method="POST" action="/auth/pin">
+            <div class="mb-3">
+                <label class="form-label">שם משתמש (אופציונלי)</label>
+                <input type="text" name="username" class="form-control">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">PIN</label>
+                <input type="password" name="pin" class="form-control" required autofocus maxlength="10">
+            </div>
+            <button type="submit" class="btn btn-primary w-100 mb-3">
+                <i class="fas fa-unlock"></i> אימות
+            </button>
+        </form>
+        
+        <a href="/auth/login" class="btn btn-outline-secondary w-100">
+            <i class="fas fa-arrow-right"></i> חזרה להתחברות
+        </a>
     </div>
 </body>
 </html>

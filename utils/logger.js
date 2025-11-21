@@ -1,6 +1,6 @@
 /**
- * Logger Utility
- * Winston-based logging system
+ * Logger Configuration
+ * Using Winston for logging
  */
 
 const winston = require('winston');
@@ -11,7 +11,6 @@ const fs = require('fs-extra');
 const logsDir = path.join(__dirname, '../logs');
 fs.ensureDirSync(logsDir);
 
-// Create logger
 const logger = winston.createLogger({
     level: process.env.LOG_LEVEL || 'info',
     format: winston.format.combine(
@@ -22,31 +21,23 @@ const logger = winston.createLogger({
     ),
     defaultMeta: { service: 'sefer-maarexet' },
     transports: [
-        // Write all logs to console
-        new winston.transports.Console({
-            format: winston.format.combine(
-                winston.format.colorize(),
-                winston.format.printf(({ timestamp, level, message, ...meta }) => {
-                    return `${timestamp} [${level}]: ${message} ${Object.keys(meta).length ? JSON.stringify(meta, null, 2) : ''}`;
-                })
-            )
+        new winston.transports.File({ 
+            filename: path.join(logsDir, 'error.log'), 
+            level: 'error' 
         }),
-        // Write all logs to file
-        new winston.transports.File({
-            filename: path.join(logsDir, 'error.log'),
-            level: 'error'
-        }),
-        // Write all logs to combined file
-        new winston.transports.File({
-            filename: path.join(logsDir, 'combined.log')
+        new winston.transports.File({ 
+            filename: path.join(logsDir, 'combined.log') 
         })
     ]
 });
 
-// If we're not in production, log to console with simpler format
+// Add console transport in development
 if (process.env.NODE_ENV !== 'production') {
     logger.add(new winston.transports.Console({
-        format: winston.format.simple()
+        format: winston.format.combine(
+            winston.format.colorize(),
+            winston.format.simple()
+        )
     }));
 }
 

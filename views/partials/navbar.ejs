@@ -1,121 +1,87 @@
-<nav class="navbar navbar-expand-lg navbar-dark mb-4">
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
     <div class="container-fluid">
         <a class="navbar-brand" href="/home">
             <i class="fas fa-book-open"></i> ספר מערכת
         </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto">
                 <li class="nav-item">
                     <a class="nav-link" href="/home">
-                        <i class="fas fa-home"></i> <span>דף הבית</span>
+                        <i class="fas fa-home"></i> דף הבית
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/datablocks">
-                        <i class="fas fa-database"></i> <span>בלוקי נתונים</span>
+                        <i class="fas fa-search"></i> חיפוש
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/computers">
-                        <i class="fas fa-desktop"></i> <span>מחשבים</span>
+                        <i class="fas fa-desktop"></i> מחשבים
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/printers">
-                        <i class="fas fa-print"></i> <span>מדפסות</span>
+                        <i class="fas fa-print"></i> מדפסות
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/phonebook">
+                        <i class="fas fa-address-book"></i> ספר טלפונים
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/suppliers">
+                        <i class="fas fa-truck"></i> ספקים
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/appstore">
-                        <i class="fas fa-store"></i> <span>חנות אפליקציות</span>
+                        <i class="fas fa-store"></i> חנות אפליקציות
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/create">
-                        <i class="fas fa-plus-circle"></i> <span>צור פריט</span>
+                    <a class="nav-link" href="/alerts">
+                        <i class="fas fa-bell"></i> התראות
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/search">
-                        <i class="fas fa-search"></i> <span>חיפוש</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/files/list">
-                        <i class="fas fa-folder-open"></i> <span>קבצים</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/deepsearch">
-                        <i class="fas fa-search-plus"></i> <span>חיפוש עמוק</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/connections/map">
-                        <i class="fas fa-project-diagram"></i> <span>מפת קשרים</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link position-relative" href="/alerts">
-                        <i class="fas fa-bell"></i> <span>התראות</span>
-                        <span id="alertsBadge" class="badge bg-danger position-absolute top-0 start-0 translate-middle" style="display: none; font-size: 0.65rem; padding: 2px 5px;">0</span>
+                    <a class="nav-link" href="/chat">
+                        <i class="fas fa-comments"></i> צ'אט
                     </a>
                 </li>
                 <% if (user && (user.isPinAuthenticated || (user.roles && user.roles.includes('itdepartment')))) { %>
                 <li class="nav-item">
                     <a class="nav-link" href="/admin">
-                        <i class="fas fa-cog"></i> <span>מנהל</span>
+                        <i class="fas fa-cog"></i> מנהל
                     </a>
                 </li>
                 <% } %>
-                <% if (user && (user.roles && (user.roles.includes('admin') || user.roles.includes('itdepartment')))) { %>
-                <li class="nav-item">
-                    <a class="nav-link" href="/permissions">
-                        <i class="fas fa-shield-alt"></i> <span>הרשאות</span>
-                    </a>
-                </li>
-                <% } %>
-                <li class="nav-item">
-                    <a class="nav-link" href="/phonebook">
-                        <i class="fas fa-address-book"></i> <span>ספר טלפונים</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/suppliers">
-                        <i class="fas fa-truck"></i> <span>ספקים</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/import">
-                        <i class="fas fa-file-import"></i> <span>ייבוא/ייצוא</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/audit">
-                        <i class="fas fa-clipboard-list"></i> <span>ביקורת</span>
-                    </a>
-                </li>
             </ul>
             <ul class="navbar-nav">
-                <% if (typeof user !== 'undefined' && user) { %>
+                <% if (user) { %>
                     <li class="nav-item">
-                        <span class="navbar-text me-3 d-flex align-items-center">
-                            <i class="fas fa-user-circle me-2"></i> 
-                            <span><%= user.name || 'Guest' %></span>
+                        <span class="navbar-text me-3">
+                            <i class="fas fa-user"></i> <%= user.name || 'Guest' %>
                         </span>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/auth/logout">
+                            <i class="fas fa-sign-out-alt"></i> התנתק
+                        </a>
+                    </li>
+                <% } else { %>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/auth/login">
+                            <i class="fas fa-sign-in-alt"></i> התחבר
+                        </a>
+                    </li>
                 <% } %>
-                <li class="nav-item">
-                    <form method="POST" action="/auth/logout" class="d-inline">
-                        <button type="submit" class="btn btn-outline-light btn-sm">
-                            <i class="fas fa-sign-out-alt"></i> <span>התנתק</span>
-                        </button>
-                    </form>
-                </li>
             </ul>
         </div>
     </div>
 </nav>
+

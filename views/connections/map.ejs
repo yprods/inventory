@@ -1,54 +1,37 @@
 <%- include('../layout', { title: 'מפת קשרים', content: `
-<div class="container-fluid mt-4">
+<div class="container-fluid mt-4 fade-in">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1><i class="fas fa-project-diagram"></i> מפת קשרים</h1>
-        <div>
-            <input type="text" id="itemFilter" class="form-control d-inline-block" style="width: 300px;" placeholder="סנן לפי פריט...">
-            <button class="btn btn-primary" onclick="loadConnectionMap()">
-                <i class="fas fa-sync"></i> רענן
-            </button>
-        </div>
+        <h1 class="display-5 fw-bold">
+            <i class="fas fa-project-diagram text-primary"></i> מפת קשרים
+        </h1>
     </div>
     
-    <div class="card">
+    <% if (typeof error !== 'undefined' && error) { %>
+        <div class="alert alert-danger"><%= error %></div>
+    <% } %>
+    
+    <div class="card shadow-lg">
         <div class="card-body">
-            <div id="connectionMap" style="height: 600px; border: 1px solid #ddd; border-radius: 4px;"></div>
-        </div>
-    </div>
-    
-    <div class="mt-4">
-        <h3>סטטיסטיקות</h3>
-        <div class="row">
-            <div class="col-md-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h5>סה"כ פריטים</h5>
-                        <h2 id="totalNodes">0</h2>
-                    </div>
+            <% if (items && items.length > 0) { %>
+                <div class="row g-3">
+                    <% items.forEach(item => { %>
+                        <div class="col-md-3">
+                            <div class="card">
+                                <div class="card-body text-center">
+                                    <h6><%= item.Name || item.CI_ID || '-' %></h6>
+                                    <a href="/datablocks?search=<%= encodeURIComponent(item.Name || item.CI_ID) %>" class="btn btn-sm btn-primary">
+                                        <i class="fas fa-eye"></i> צפה
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    <% }); %>
                 </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h5>סה"כ קשרים</h5>
-                        <h2 id="totalEdges">0</h2>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h5>פריטים נבחרים</h5>
-                        <h2 id="selectedNodes">0</h2>
-                    </div>
-                </div>
-            </div>
+            <% } else { %>
+                <p class="text-muted text-center">אין פריטים להצגה</p>
+            <% } %>
         </div>
     </div>
 </div>
-
-<script src="https://unpkg.com/vis-network@latest/dist/vis-network.min.js"></script>
-<link rel="stylesheet" href="https://unpkg.com/vis-network@latest/dist/vis-network.min.css">
-<script src="/js/connectionMap.js"></script>
 ` }) %>
 

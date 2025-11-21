@@ -1,52 +1,40 @@
-<%- include('../layout', { title: 'לוח בקרה - מנהל', content: `
-<div class="container mt-4">
-    <h1><i class="fas fa-tachometer-alt"></i> לוח בקרה - מנהל</h1>
+<%- include('../layout', { title: 'מנהל מערכת', content: `
+<div class="container mt-4 fade-in">
+    <h1 class="display-5 fw-bold mb-4">
+        <i class="fas fa-cog text-primary"></i> מנהל מערכת
+    </h1>
     
-    <div class="row mt-4">
+    <div class="row g-4">
         <div class="col-md-4">
-            <div class="card text-white bg-primary">
-                <div class="card-body">
-                    <h5 class="card-title"><i class="fas fa-database"></i> סה"כ CI</h5>
-                    <h2><%= typeof stats !== 'undefined' ? stats.totalCI : 0 %></h2>
+            <div class="card shadow-lg">
+                <div class="card-body text-center">
+                    <i class="fas fa-database fa-3x text-primary mb-3"></i>
+                    <h5>מסד נתונים</h5>
+                    <p class="mb-0">
+                        <span class="badge bg-<%= dbConnected ? 'success' : 'danger' %>">
+                            <%= dbType.toUpperCase() %> - <%= dbConnected ? 'מחובר' : 'לא מחובר' %>
+                        </span>
+                    </p>
                 </div>
             </div>
         </div>
         
         <div class="col-md-4">
-            <div class="card text-white bg-success">
-                <div class="card-body">
-                    <h5 class="card-title"><i class="fas fa-network-wired"></i> פריטי רשת</h5>
-                    <h2><%= typeof stats !== 'undefined' ? stats.totalNetworkItems : 0 %></h2>
+            <div class="card shadow-lg">
+                <div class="card-body text-center">
+                    <i class="fas fa-list fa-3x text-success mb-3"></i>
+                    <h5>סה"כ פריטים</h5>
+                    <h2 class="mb-0"><%= itemCount %></h2>
                 </div>
             </div>
         </div>
         
         <div class="col-md-4">
-            <div class="card text-white bg-info">
-                <div class="card-body">
-                    <h5 class="card-title"><i class="fas fa-users"></i> משתמשים</h5>
-                    <h2>1</h2>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="row mt-4">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5>פעולות מהירות</h5>
-                </div>
-                <div class="card-body">
-                    <a href="/admin/database" class="btn btn-primary me-2">
-                        <i class="fas fa-database"></i> ניהול מסד נתונים
-                    </a>
-                    <a href="/files/list" class="btn btn-secondary me-2">
-                        <i class="fas fa-folder"></i> ניהול קבצים
-                    </a>
-                    <a href="/search" class="btn btn-info">
-                        <i class="fas fa-search"></i> חיפוש מתקדם
-                    </a>
+            <div class="card shadow-lg">
+                <div class="card-body text-center">
+                    <i class="fas fa-user fa-3x text-info mb-3"></i>
+                    <h5>משתמש נוכחי</h5>
+                    <p class="mb-0"><%= user.name %></p>
                 </div>
             </div>
         </div>

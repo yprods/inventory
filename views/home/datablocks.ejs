@@ -5,30 +5,20 @@
     <% } %>
     
     <% if (typeof data !== 'undefined' && data) { %>
-        <!-- Main Header -->
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h1 class="display-5 fw-bold">
                 <i class="fas fa-database text-primary"></i> <%= data.Name || search %>
             </h1>
-            <div class="d-flex gap-2">
-                <a href="/home" class="btn btn-outline-secondary">
-                    <i class="fas fa-home"></i> דף הבית
-                </a>
-                <% if (user && (user.roles && user.roles.includes('itdepartment') || user.isPinAuthenticated)) { %>
-                    <a href="/create?search=<%= encodeURIComponent(data.Name || search) %>" class="btn btn-outline-primary">
-                        <i class="fas fa-edit"></i> ערוך
-                    </a>
-                <% } %>
-            </div>
+            <a href="/home" class="btn btn-outline-secondary">
+                <i class="fas fa-home"></i> דף הבית
+            </a>
         </div>
         
-        <!-- Search Bar -->
         <div class="card shadow-md mb-4">
             <div class="card-body">
                 <form action="/datablocks" method="GET" class="d-flex gap-2">
                     <input type="text" name="search" class="form-control form-control-lg" 
-                           placeholder="חפש במערכת הנוכחית או עבור למערכת אחרת..." 
-                           value="<%= search %>" autofocus>
+                           placeholder="חפש במערכת..." value="<%= search %>" autofocus>
                     <button type="submit" class="btn btn-primary btn-lg">
                         <i class="fas fa-search"></i> חפש
                     </button>
@@ -36,8 +26,7 @@
             </div>
         </div>
         
-        <!-- Data Grid - Display all fields f0-f50 -->
-        <div class="card shadow-lg mb-4">
+        <div class="card shadow-lg">
             <div class="card-header bg-primary text-white">
                 <h5 class="mb-0"><i class="fas fa-table"></i> פרטי המערכת</h5>
             </div>
@@ -78,84 +67,7 @@
             </div>
         </div>
         
-        <!-- Quick Actions -->
-        <div class="row g-4 mb-4">
-            <div class="col-md-4">
-                <div class="card shadow-md">
-                    <div class="card-body text-center">
-                        <i class="fas fa-network-wired fa-3x text-primary mb-3"></i>
-                        <h5>בדיקת חיבור</h5>
-                        <button class="btn btn-outline-primary" onclick="pingHost('<%= data.Name || search %>')">
-                            <i class="fas fa-signal"></i> בדוק חיבור
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card shadow-md">
-                    <div class="card-body text-center">
-                        <i class="fas fa-project-diagram fa-3x text-success mb-3"></i>
-                        <h5>קשרים</h5>
-                        <a href="/connections/item/<%= encodeURIComponent(data.Name || search) %>" class="btn btn-outline-success">
-                            <i class="fas fa-link"></i> צפה בקשרים
-                        </a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card shadow-md">
-                    <div class="card-body text-center">
-                        <i class="fas fa-paperclip fa-3x text-info mb-3"></i>
-                        <h5>קבצים</h5>
-                        <button class="btn btn-outline-info" onclick="showAttachmentModal('<%= data.Name || search %>')">
-                            <i class="fas fa-upload"></i> צרף קובץ
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Attachments Section -->
-        <div class="card shadow-md mb-4">
-            <div class="card-header">
-                <h5 class="mb-0"><i class="fas fa-paperclip"></i> קבצים מצורפים</h5>
-            </div>
-            <div class="card-body">
-                <div id="attachmentsList" class="list-group">
-                    <p class="text-muted">טוען...</p>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Comments Section -->
-        <div class="card shadow-md mb-4">
-            <div class="card-header">
-                <h5 class="mb-0"><i class="fas fa-comments"></i> תגובות</h5>
-            </div>
-            <div class="card-body">
-                <div id="commentsContainer">
-                    <p class="text-muted">טוען תגובות...</p>
-                </div>
-                <hr>
-                <form id="commentForm">
-                    <input type="hidden" name="search" value="<%= data.Name || search %>">
-                    <div class="mb-3">
-                        <label class="form-label">הוסף תגובה</label>
-                        <textarea name="message" class="form-control" rows="3" required></textarea>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">נושא</label>
-                        <input type="text" name="subject" class="form-control" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-paper-plane"></i> שלח תגובה
-                    </button>
-                </form>
-            </div>
-        </div>
-        
     <% } else if (search) { %>
-        <!-- Item Not Found -->
         <div class="card shadow-lg">
             <div class="card-body text-center py-5">
                 <i class="fas fa-search fa-4x text-muted mb-3"></i>
@@ -167,7 +79,6 @@
             </div>
         </div>
     <% } else { %>
-        <!-- No Search Term -->
         <div class="card shadow-lg">
             <div class="card-body text-center py-5">
                 <i class="fas fa-search fa-4x text-primary mb-3"></i>
@@ -184,175 +95,5 @@
         </div>
     <% } %>
 </div>
-
-<!-- Attachment Modal -->
-<div class="modal fade" id="attachmentModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title"><i class="fas fa-upload"></i> צרף קובץ</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <form id="attachmentForm" enctype="multipart/form-data">
-                <div class="modal-body">
-                    <input type="hidden" id="attachmentItemName" name="itemName">
-                    <div class="mb-3">
-                        <label for="attachmentFile" class="form-label">בחר קובץ</label>
-                        <input type="file" class="form-control" id="attachmentFile" name="file" required>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-                    <button type="button" class="btn btn-primary" onclick="uploadAttachment()">
-                        <i class="fas fa-upload"></i> העלה
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<script>
-const currentItemName = '<%= (data && data.Name) || search || "" %>';
-
-// Load attachments and comments on page load
-document.addEventListener('DOMContentLoaded', function() {
-    if (currentItemName) {
-        loadAttachments(currentItemName);
-        loadComments(currentItemName);
-    }
-    
-    // Comment form submission
-    document.getElementById('commentForm')?.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        const formData = new FormData(this);
-        
-        try {
-            const response = await fetch('/api/comments/submit', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    search: formData.get('search'),
-                    subject: formData.get('subject'),
-                    message: formData.get('message')
-                })
-            });
-            
-            const data = await response.json();
-            if (data.success) {
-                this.reset();
-                loadComments(currentItemName);
-                alert('תגובה נשלחה בהצלחה!');
-            } else {
-                alert('שגיאה: ' + (data.error || 'Unknown error'));
-            }
-        } catch (error) {
-            console.error('Comment error:', error);
-            alert('שגיאה בשליחת התגובה');
-        }
-    });
-});
-
-function showAttachmentModal(itemName) {
-    document.getElementById('attachmentItemName').value = itemName;
-    new bootstrap.Modal(document.getElementById('attachmentModal')).show();
-}
-
-async function uploadAttachment() {
-    const form = document.getElementById('attachmentForm');
-    const formData = new FormData(form);
-    
-    try {
-        const response = await fetch('/api/attachments/attach', {
-            method: 'POST',
-            body: formData
-        });
-        
-        const data = await response.json();
-        if (data.success) {
-            bootstrap.Modal.getInstance(document.getElementById('attachmentModal')).hide();
-            loadAttachments(currentItemName);
-            alert('הקובץ הועלה בהצלחה!');
-        } else {
-            alert('שגיאה: ' + (data.error || 'Unknown error'));
-        }
-    } catch (error) {
-        console.error('Upload error:', error);
-        alert('שגיאה בהעלאת הקובץ');
-    }
-}
-
-async function loadAttachments(itemName) {
-    try {
-        const response = await fetch(`/api/attachments/item/${encodeURIComponent(itemName)}`);
-        const data = await response.json();
-        
-        const list = document.getElementById('attachmentsList');
-        if (data.success && data.attachments && data.attachments.length > 0) {
-            list.innerHTML = data.attachments.map(att => `
-                <div class="list-group-item d-flex justify-content-between align-items-center">
-                    <div>
-                        <i class="fas fa-file"></i> <strong>${att.OriginalName}</strong>
-                        <small class="text-muted ms-2">(${(att.Size / 1024).toFixed(2)} KB)</small>
-                    </div>
-                    <a href="${att.url}" class="btn btn-sm btn-primary" download>
-                        <i class="fas fa-download"></i> הורד
-                    </a>
-                </div>
-            `).join('');
-        } else {
-            list.innerHTML = '<p class="text-muted mb-0">אין קבצים מצורפים</p>';
-        }
-    } catch (error) {
-        console.error('Error loading attachments:', error);
-        document.getElementById('attachmentsList').innerHTML = '<p class="text-danger">שגיאה בטעינת הקבצים</p>';
-    }
-}
-
-async function loadComments(itemName) {
-    try {
-        const response = await fetch(`/api/comments/get?search=${encodeURIComponent(itemName)}`);
-        const data = await response.json();
-        
-        const container = document.getElementById('commentsContainer');
-        if (data.success && data.comments && data.comments.length > 0) {
-            container.innerHTML = data.comments.map(comment => `
-                <div class="card mb-3">
-                    <div class="card-body">
-                        <h6 class="card-title">${comment.Subject || 'ללא נושא'}</h6>
-                        <p class="card-text">${comment.Message || ''}</p>
-                        <small class="text-muted">
-                            <i class="fas fa-user"></i> ${comment.User || 'Unknown'} | 
-                            <i class="fas fa-calendar"></i> ${new Date(comment.SubmittedDate).toLocaleString('he-IL')}
-                        </small>
-                    </div>
-                </div>
-            `).join('');
-        } else {
-            container.innerHTML = '<p class="text-muted mb-0">אין תגובות</p>';
-        }
-    } catch (error) {
-        console.error('Error loading comments:', error);
-        document.getElementById('commentsContainer').innerHTML = '<p class="text-danger">שגיאה בטעינת התגובות</p>';
-    }
-}
-
-function pingHost(hostname) {
-    if (!hostname) {
-        alert('שם מארח לא תקין');
-        return;
-    }
-    
-    fetch(`/api/ping?host=${encodeURIComponent(hostname)}`)
-        .then(response => response.json())
-        .then(data => {
-            const message = data.success ? '🟢 חיבור תקין' : '🔴 בעיית חיבור';
-            alert(message);
-        })
-        .catch(error => {
-            console.error('Ping error:', error);
-            alert('שגיאה בבדיקת החיבור');
-        });
-}
-</script>
 ` }) %>
+

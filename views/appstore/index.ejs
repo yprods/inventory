@@ -4,36 +4,15 @@
         <h1 class="display-5 fw-bold">
             <i class="fas fa-store text-primary"></i> חנות אפליקציות
         </h1>
-        <a href="/appstore/create" class="btn btn-primary btn-lg">
-            <i class="fas fa-plus-circle"></i> הוסף אפליקציה
-        </a>
     </div>
     
-    <!-- Search and Filters -->
     <div class="card shadow-md mb-4">
         <div class="card-body">
-            <form method="GET" action="/appstore" class="row g-3">
-                <div class="col-md-4">
-                    <label class="form-label"><i class="fas fa-search"></i> חיפוש</label>
-                    <input type="text" name="search" class="form-control" value="<%= search %>" placeholder="חפש אפליקציה...">
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label"><i class="fas fa-folder"></i> קטגוריה</label>
-                    <select name="category" class="form-control">
-                        <option value="">הכל</option>
-                        <% categories.forEach(cat => { %>
-                            <option value="<%= cat.category %>" <%= category === cat.category ? 'selected' : '' %>>
-                                <%= cat.category %>
-                            </option>
-                        <% }); %>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label">&nbsp;</label>
-                    <button type="submit" class="btn btn-primary w-100">
-                        <i class="fas fa-search"></i> חפש
-                    </button>
-                </div>
+            <form method="GET" action="/appstore" class="d-flex gap-2">
+                <input type="text" name="search" class="form-control" value="<%= search %>" placeholder="חפש אפליקציה...">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-search"></i> חפש
+                </button>
             </form>
         </div>
     </div>
@@ -42,48 +21,16 @@
         <div class="alert alert-danger"><%= error %></div>
     <% } %>
     
-    <!-- Apps Grid -->
     <% if (apps && apps.length > 0) { %>
         <div class="row g-4">
             <% apps.forEach(app => { %>
-                <div class="col-md-3">
+                <div class="col-md-4">
                     <div class="card shadow-md h-100">
-                        <div class="card-body text-center">
-                            <% if (app.f8) { %>
-                                <img src="<%= app.f8 %>" alt="<%= app.Name || app.name %>" class="img-fluid mb-3" style="max-height: 80px; object-fit: contain;">
-                            <% } else { %>
-                                <div class="mb-3">
-                                    <i class="fas fa-mobile-alt fa-4x text-primary"></i>
-                                </div>
-                            <% } %>
-                            
-                            <h5 class="card-title fw-bold">
-                                <%= app.Name || app.name || app.f0 || 'ללא שם' %>
-                            </h5>
-                            
-                            <p class="text-muted mb-2">
-                                <i class="fas fa-code"></i> <%= app.f3 || 'ללא מפתח' %>
-                            </p>
-                            
-                            <p class="text-muted mb-2">
-                                <i class="fas fa-tag"></i> <%= app.f1 || 'ללא קטגוריה' %>
-                            </p>
-                            
-                            <p class="text-muted mb-3">
-                                <i class="fas fa-info-circle"></i> גרסה <%= app.f2 || '1.0.0' %>
-                            </p>
-                            
-                            <div class="mb-3">
-                                <span class="badge bg-<%= app.f9 === 'Free' ? 'success' : 'warning' %>">
-                                    <i class="fas fa-<%= app.f9 === 'Free' ? 'gift' : 'dollar-sign' %>"></i> <%= app.f9 || 'Free' %>
-                                </span>
-                                <% if (app.f4 && app.f4 !== '0') { %>
-                                    <span class="badge bg-info">₪<%= app.f4 %></span>
-                                <% } %>
-                            </div>
-                            
-                            <a href="/appstore/<%= encodeURIComponent(app.Name || app.name || app.CI_ID) %>" class="btn btn-primary w-100">
-                                <i class="fas fa-eye"></i> פרטים
+                        <div class="card-body">
+                            <h5 class="card-title"><%= app.Name || app.name || app.f0 || 'ללא שם' %></h5>
+                            <p class="text-muted"><%= app.f1 || 'ללא תיאור' %></p>
+                            <a href="/datablocks?search=<%= encodeURIComponent(app.Name || app.name) %>" class="btn btn-primary">
+                                <i class="fas fa-eye"></i> צפה בפרטים
                             </a>
                         </div>
                     </div>
@@ -91,14 +38,11 @@
             <% }); %>
         </div>
     <% } else { %>
-        <div class="card shadow-md">
+        <div class="card shadow-lg">
             <div class="card-body text-center py-5">
                 <i class="fas fa-store fa-4x text-muted mb-3"></i>
                 <h4>אין אפליקציות</h4>
                 <p class="text-muted">לא נמצאו אפליקציות במערכת</p>
-                <a href="/appstore/create" class="btn btn-primary">
-                    <i class="fas fa-plus"></i> הוסף אפליקציה ראשונה
-                </a>
             </div>
         </div>
     <% } %>

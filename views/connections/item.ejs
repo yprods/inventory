@@ -1,109 +1,20 @@
-<%- include('../layout', { title: `קשרים - ${itemName}`, content: `
-<div class="container mt-4">
-    <h1><i class="fas fa-link"></i> קשרים - <%= itemName %></h1>
+<%- include('../layout', { title: `קשרים - ${item?.Name || 'Unknown'}`, content: `
+<div class="container mt-4 fade-in">
+    <h1 class="display-5 fw-bold mb-4">
+        <i class="fas fa-link text-primary"></i> קשרים - <%= item?.Name || 'Unknown' %>
+    </h1>
     
-    <div class="row mt-4">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <h5>קשרים יוצאים</h5>
-                </div>
-                <div class="card-body">
-                    <% const outgoing = connections.filter(c => c.isOutgoing); %>
-                    <% if (outgoing.length > 0) { %>
-                        <ul class="list-group">
-                            <% outgoing.forEach(conn => { %>
-                                <li class="list-group-item">
-                                    <strong><%= conn.TargetItem %></strong>
-                                    <span class="badge bg-primary"><%= conn.ConnectionType %></span>
-                                    <a href="/connections/item/<%= encodeURIComponent(conn.TargetItem) %>" class="btn btn-sm btn-outline-primary float-end">
-                                        <i class="fas fa-eye"></i> צפה
-                                    </a>
-                                </li>
-                            <% }); %>
-                        </ul>
-                    <% } else { %>
-                        <p class="text-muted">אין קשרים יוצאים</p>
-                    <% } %>
-                </div>
-            </div>
+    <div class="card shadow-lg">
+        <div class="card-body">
+            <% if (item) { %>
+                <a href="/datablocks?search=<%= encodeURIComponent(item.Name || item.CI_ID) %>" class="btn btn-primary">
+                    <i class="fas fa-eye"></i> צפה בפרטי הפריט
+                </a>
+            <% } else { %>
+                <p class="text-muted">פריט לא נמצא</p>
+            <% } %>
         </div>
-        
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <h5>קשרים נכנסים</h5>
-                </div>
-                <div class="card-body">
-                    <% const incoming = connections.filter(c => c.isIncoming); %>
-                    <% if (incoming.length > 0) { %>
-                        <ul class="list-group">
-                            <% incoming.forEach(conn => { %>
-                                <li class="list-group-item">
-                                    <strong><%= conn.SourceItem %></strong>
-                                    <span class="badge bg-success"><%= conn.ConnectionType %></span>
-                                    <a href="/connections/item/<%= encodeURIComponent(conn.SourceItem) %>" class="btn btn-sm btn-outline-primary float-end">
-                                        <i class="fas fa-eye"></i> צפה
-                                    </a>
-                                </li>
-                            <% }); %>
-                        </ul>
-                    <% } else { %>
-                        <p class="text-muted">אין קשרים נכנסים</p>
-                    <% } %>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="row mt-4">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5>פריטים קשורים</h5>
-                </div>
-                <div class="card-body">
-                    <% if (relatedItems && relatedItems.length > 0) { %>
-                        <div class="d-flex flex-wrap gap-2">
-                            <% relatedItems.forEach(item => { %>
-                                <a href="/datablocks?search=<%= encodeURIComponent(item) %>" class="btn btn-outline-primary">
-                                    <%= item %>
-                                </a>
-                            <% }); %>
-                        </div>
-                    <% } else { %>
-                        <p class="text-muted">אין פריטים קשורים</p>
-                    <% } %>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="mt-4">
-        <a href="/connections/map?item=<%= encodeURIComponent(itemName) %>" class="btn btn-primary">
-            <i class="fas fa-project-diagram"></i> צפה במפה המלאה
-        </a>
-        <button class="btn btn-success" onclick="autoDetectConnections('<%= itemName %>')">
-            <i class="fas fa-magic"></i> זהה קשרים אוטומטית
-        </button>
     </div>
 </div>
-
-<script>
-function autoDetectConnections(itemName) {
-    fetch(`/api/connections/auto-detect/${encodeURIComponent(itemName)}`, {
-        method: 'POST'
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.success) {
-            alert(`זוהו ${data.count} קשרים חדשים!`);
-            location.reload();
-        } else {
-            alert('שגיאה בזיהוי קשרים');
-        }
-    });
-}
-</script>
 ` }) %>
 

@@ -1,23 +1,24 @@
 /**
  * Authentication Middleware
+ * Supports session, PIN, and NTLM authentication
  */
 
 const logger = require('../utils/logger');
-const ntlmService = require('../services/ntlmService');
 
 /**
  * Authenticate user middleware
  * Checks session, PIN, or NTLM for authenticated user
  */
 async function authenticateUser(req, res, next) {
-    // Skip authentication for auth routes
-    if (req.path.startsWith('/auth')) {
+    // Skip authentication for auth routes and API routes
+    if (req.path.startsWith('/auth') || req.path.startsWith('/api')) {
         return next();
     }
     
     // Check if user is authenticated via session
     if (req.session && req.session.user) {
         req.user = req.session.user;
+        res.locals.user = req.session.user;
         return next();
     }
     
@@ -27,21 +28,25 @@ async function authenticateUser(req, res, next) {
             name: req.session.userName || 'Guest',
             isPinAuthenticated: true
         };
+        res.locals.user = req.user;
         return next();
     }
     
-    // Check for NTLM authentication
-    if (ntlmService.isNTLMEnabled()) {
-        try {
+    // Check for NTLM authentication (if enabled)
+    try {
+        const ntlmService = require('../services/ntlmService');
+        if (ntlmService && ntlmService.isNTLMEnabled && ntlmService.isNTLMEnabled()) {
             const ntlmUser = await ntlmService.authenticateNTLM(req);
             if (ntlmUser) {
                 req.session.user = ntlmUser;
                 req.user = ntlmUser;
+                res.locals.user = ntlmUser;
                 return next();
             }
-        } catch (error) {
-            logger.warn('NTLM authentication failed:', error.message);
         }
+    } catch (error) {
+        // NTLM service might not exist, that's okay
+        logger.warn('NTLM authentication check failed:', error.message);
     }
     
     // Store redirect URL for after login

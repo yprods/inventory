@@ -12,25 +12,15 @@ function errorHandler(err, req, res, next) {
         method: req.method
     });
     
-    // Set status code
-    const statusCode = err.statusCode || err.status || 500;
+    // Don't leak error details in production
+    const message = process.env.NODE_ENV === 'production' 
+        ? 'שגיאה פנימית בשרת' 
+        : err.message;
     
-    // Send error response
-    if (req.accepts('html')) {
-        // HTML response
-        res.status(statusCode).render('error', {
-            title: 'שגיאה',
-            message: err.message || 'אירעה שגיאה',
-            error: process.env.NODE_ENV === 'development' ? err : {}
-        });
-    } else {
-        // JSON response
-        res.status(statusCode).json({
-            success: false,
-            error: err.message || 'An error occurred',
-            ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
-        });
-    }
+    res.status(err.status || 500).render('error', {
+        title: 'שגיאה',
+        message: message
+    });
 }
 
 module.exports = { errorHandler };

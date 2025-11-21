@@ -1,10 +1,11 @@
 /**
  * Database Configuration
- * Supports both SQL Server and SQLite
+ * Supports SQL Server with SQLite fallback
+ * Automatically falls back to SQLite if SQL Server is unavailable
  */
 
 const sql = require('mssql');
-const sqlite3 = require('sqlite3').verbose();
+const Database = require('better-sqlite3');
 const path = require('path');
 const fs = require('fs-extra');
 const logger = require('../utils/logger');
@@ -19,7 +20,9 @@ const sqlServerConfig = {
     options: {
         encrypt: process.env.DB_ENCRYPT === 'true',
         trustServerCertificate: process.env.DB_TRUST_CERTIFICATE === 'true',
-        enableArithAbort: true
+        enableArithAbort: true,
+        connectTimeout: 5000,
+        requestTimeout: 5000
     },
     pool: {
         max: 10,
@@ -29,63 +32,159 @@ const sqlServerConfig = {
 };
 
 let sqlServerPool = null;
+let useSQLite = false;
+let sqliteDb = null;
+
+// SQLite Configuration
+const sqliteDbPath = path.join(__dirname, '../data/sefer_maarexet.db');
 
 /**
- * Get SQL Server connection pool
+ * Initialize SQLite database
  */
-async function getSqlServerPool() {
+function initializeSQLite() {
     try {
-        if (!sqlServerPool) {
-            sqlServerPool = await sql.connect(sqlServerConfig);
-            logger.info('SQL Server connection pool created');
-        }
-        return sqlServerPool;
+        const dbDir = path.dirname(sqliteDbPath);
+        fs.ensureDirSync(dbDir);
+        
+        sqliteDb = new Database(sqliteDbPath);
+        sqliteDb.pragma('journal_mode = WAL');
+        sqliteDb.pragma('foreign_keys = ON');
+        
+        // Create tables if they don't exist
+        sqliteDb.exec(`
+            CREATE TABLE IF NOT EXISTS CI (
+                Name TEXT PRIMARY KEY,
+                CI_ID TEXT UNIQUE NOT NULL,
+                CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
+            );
+            
+            CREATE TABLE IF NOT EXISTS DATABOX (
+                name TEXT PRIMARY KEY,
+                f0 TEXT, f1 TEXT, f2 TEXT, f3 TEXT, f4 TEXT, f5 TEXT, f6 TEXT, f7 TEXT, f8 TEXT, f9 TEXT,
+                f10 TEXT, f11 TEXT, f12 TEXT, f13 TEXT, f14 TEXT, f15 TEXT, f16 TEXT, f17 TEXT, f18 TEXT, f19 TEXT,
+                f20 TEXT, f21 TEXT, f22 TEXT, f23 TEXT, f24 TEXT, f25 TEXT, f26 TEXT, f27 TEXT, f28 TEXT, f29 TEXT,
+                f30 TEXT, f31 TEXT, f32 TEXT, f33 TEXT, f34 TEXT, f35 TEXT, f36 TEXT, f37 TEXT, f38 TEXT, f39 TEXT,
+                f40 TEXT, f41 TEXT, f42 TEXT, f43 TEXT, f44 TEXT, f45 TEXT, f46 TEXT, f47 TEXT, f48 TEXT, f49 TEXT, f50 TEXT,
+                FOREIGN KEY (name) REFERENCES CI(CI_ID)
+            );
+            
+            CREATE INDEX IF NOT EXISTS idx_CI_Name ON CI(Name);
+            CREATE INDEX IF NOT EXISTS idx_CI_CI_ID ON CI(CI_ID);
+            CREATE INDEX IF NOT EXISTS idx_DATABOX_name ON DATABOX(name);
+        `);
+        
+        logger.info('SQLite database initialized successfully');
+        return true;
     } catch (error) {
-        logger.error('SQL Server connection error:', error);
-        throw error;
-    }
-}
-
-/**
- * Check if local mode is enabled
- */
-async function isLocalMode() {
-    try {
-        const sqliteExportService = require('../services/sqliteExportService');
-        return await sqliteExportService.isLocalMode();
-    } catch (error) {
+        logger.error('Error initializing SQLite:', error);
         return false;
     }
 }
 
 /**
- * Execute SQL Server query (or SQLite if in local mode)
+ * Test SQL Server connection
  */
-async function executeQuery(query, params = {}) {
+async function testSQLServerConnection() {
     try {
-        // Check if local mode is enabled
-        if (await isLocalMode()) {
-            // Convert SQL Server query to SQLite format
-            let sqliteQuery = query;
-            const sqliteParams = [];
-            
-            // Replace SQL Server parameter syntax (@param) with SQLite (?)
-            const paramKeys = Object.keys(params);
-            paramKeys.forEach((key, index) => {
-                sqliteQuery = sqliteQuery.replace(new RegExp(`@${key}`, 'g'), '?');
-                sqliteParams.push(params[key]);
-            });
-            
-            // Replace SQL Server specific syntax
-            sqliteQuery = sqliteQuery.replace(/GETDATE\(\)/gi, "datetime('now')");
-            sqliteQuery = sqliteQuery.replace(/TOP\s+(\d+)/gi, 'LIMIT $1');
-            sqliteQuery = sqliteQuery.replace(/DATABOX\./g, 'DATABOX_Local.');
-            sqliteQuery = sqliteQuery.replace(/CI\./g, 'CI_Local.');
-            
-            return await executeSqliteQuery(sqliteQuery, sqliteParams);
+        if (!sqlServerConfig.user || !sqlServerConfig.password) {
+            logger.warn('SQL Server credentials not configured, using SQLite');
+            return false;
         }
         
-        // Use SQL Server
+        const testPool = await sql.connect(sqlServerConfig);
+        await testPool.request().query('SELECT 1');
+        await testPool.close();
+        return true;
+    } catch (error) {
+        logger.warn('SQL Server connection test failed:', error.message);
+        return false;
+    }
+}
+
+/**
+ * Initialize database connection
+ */
+async function initializeDatabase() {
+    // Try SQL Server first
+    const sqlServerAvailable = await testSQLServerConnection();
+    
+    if (sqlServerAvailable) {
+        try {
+            sqlServerPool = await sql.connect(sqlServerConfig);
+            logger.info('SQL Server connection established');
+            useSQLite = false;
+            return { type: 'sqlserver', connected: true };
+        } catch (error) {
+            logger.warn('Failed to connect to SQL Server, falling back to SQLite:', error.message);
+        }
+    } else {
+        logger.warn('SQL Server not available, using SQLite');
+    }
+    
+    // Fallback to SQLite
+    const sqliteInitialized = initializeSQLite();
+    if (sqliteInitialized) {
+        useSQLite = true;
+        logger.info('Using SQLite as primary database');
+        return { type: 'sqlite', connected: true };
+    }
+    
+    logger.error('Failed to initialize any database');
+    return { type: 'none', connected: false };
+}
+
+/**
+ * Get SQL Server connection pool
+ */
+async function getSqlServerPool() {
+    if (useSQLite) {
+        throw new Error('SQL Server not available, using SQLite');
+    }
+    
+    if (!sqlServerPool) {
+        sqlServerPool = await sql.connect(sqlServerConfig);
+    }
+    return sqlServerPool;
+}
+
+/**
+ * Convert SQL Server query to SQLite format
+ */
+function convertQueryToSQLite(query, params) {
+    let sqliteQuery = query;
+    const sqliteParams = [];
+    
+    // Replace SQL Server parameter syntax (@param) with SQLite (?)
+    const paramKeys = Object.keys(params || {});
+    paramKeys.forEach((key, index) => {
+        const regex = new RegExp(`@${key}\\b`, 'g');
+        sqliteQuery = sqliteQuery.replace(regex, '?');
+        sqliteParams.push(params[key]);
+    });
+    
+        // Replace SQL Server specific syntax
+        sqliteQuery = sqliteQuery.replace(/GETDATE\(\)/gi, "datetime('now')");
+        sqliteQuery = sqliteQuery.replace(/TOP\s+(\d+)/gi, '');
+        // Move LIMIT to end if it exists in query
+        if (sqliteQuery.includes('LIMIT')) {
+            // Already has LIMIT, keep it
+        } else if (sqliteQuery.match(/SELECT.*LIMIT/i)) {
+            // LIMIT already in query
+        }
+        sqliteQuery = sqliteQuery.replace(/ISNULL\(([^,]+),\s*([^)]+)\)/gi, 'COALESCE($1, $2)');
+    
+    return { query: sqliteQuery, params: sqliteParams };
+}
+
+/**
+ * Execute query (automatically uses SQLite if SQL Server unavailable)
+ */
+async function executeQuery(query, params = {}) {
+    if (useSQLite) {
+        return executeSQLiteQuery(query, params);
+    }
+    
+    try {
         const pool = await getSqlServerPool();
         const request = pool.request();
         
@@ -97,122 +196,101 @@ async function executeQuery(query, params = {}) {
         const result = await request.query(query);
         return result.recordset;
     } catch (error) {
-        logger.error('Query execution error:', error);
-        throw error;
-    }
-}
-
-/**
- * Execute SQL Server stored procedure
- */
-async function executeProcedure(procedureName, params = {}) {
-    try {
-        const pool = await getSqlServerPool();
-        const request = pool.request();
+        logger.warn('SQL Server query failed, falling back to SQLite:', error.message);
         
-        Object.keys(params).forEach(key => {
-            request.input(key, params[key]);
-        });
-        
-        const result = await request.execute(procedureName);
-        return result.recordset;
-    } catch (error) {
-        logger.error('Stored procedure execution error:', error);
-        throw error;
-    }
-}
-
-// SQLite Configuration
-const sqliteDbPath = process.env.SQLITE_DB_PATH || path.join(__dirname, '../data/network_items.db');
-let sqliteDb = null;
-
-/**
- * Get SQLite database connection
- */
-function getSqliteDb() {
-    return new Promise((resolve, reject) => {
-        if (sqliteDb) {
-            return resolve(sqliteDb);
-        }
-        
-        // Ensure directory exists
-        const dbDir = path.dirname(sqliteDbPath);
-        fs.ensureDirSync(dbDir);
-        
-        sqliteDb = new sqlite3.Database(sqliteDbPath, (err) => {
-            if (err) {
-                logger.error('SQLite connection error:', err);
-                return reject(err);
+        // Fallback to SQLite
+        if (!useSQLite) {
+            const sqliteInitialized = initializeSQLite();
+            if (sqliteInitialized) {
+                useSQLite = true;
+                return executeSQLiteQuery(query, params);
             }
-            logger.info('SQLite database connected');
-            initializeSqliteTables();
-            resolve(sqliteDb);
-        });
-    });
-}
-
-/**
- * Initialize SQLite tables
- */
-function initializeSqliteTables() {
-    const createTables = `
-        CREATE TABLE IF NOT EXISTS NetworkItems (
-            Id INTEGER PRIMARY KEY AUTOINCREMENT,
-            Name TEXT NOT NULL UNIQUE,
-            ItemType TEXT,
-            CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-            UpdatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-            CreatedBy TEXT,
-            f0 TEXT, f1 TEXT, f2 TEXT, f3 TEXT, f4 TEXT,
-            f5 TEXT, f6 TEXT, f7 TEXT, f8 TEXT, f9 TEXT,
-            f10 TEXT, f11 TEXT, f12 TEXT, f13 TEXT, f14 TEXT,
-            f15 TEXT, f16 TEXT, f17 TEXT, f18 TEXT, f19 TEXT,
-            f20 TEXT, f21 TEXT, f22 TEXT, f23 TEXT, f24 TEXT,
-            f25 TEXT, f26 TEXT, f27 TEXT, f28 TEXT, f29 TEXT,
-            f30 TEXT, f31 TEXT, f32 TEXT, f33 TEXT, f34 TEXT,
-            f35 TEXT, f36 TEXT, f37 TEXT, f38 TEXT, f39 TEXT,
-            f40 TEXT, f41 TEXT, f42 TEXT, f43 TEXT, f44 TEXT,
-            f45 TEXT, f46 TEXT, f47 TEXT, f48 TEXT, f49 TEXT,
-            f50 TEXT
-        );
-        
-        CREATE INDEX IF NOT EXISTS idx_NetworkItems_Name ON NetworkItems(Name);
-        
-        CREATE TABLE IF NOT EXISTS NetworkItemRelations (
-            Id INTEGER PRIMARY KEY AUTOINCREMENT,
-            NetworkItemId INTEGER NOT NULL,
-            RelatedTable TEXT NOT NULL,
-            RelatedId TEXT NOT NULL,
-            RelationType TEXT,
-            CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (NetworkItemId) REFERENCES NetworkItems(Id) ON DELETE CASCADE
-        );
-    `;
-    
-    sqliteDb.exec(createTables, (err) => {
-        if (err) {
-            logger.error('Error initializing SQLite tables:', err);
-        } else {
-            logger.info('SQLite tables initialized');
         }
-    });
+        
+        throw error;
+    }
 }
 
 /**
  * Execute SQLite query
  */
-function executeSqliteQuery(query, params = []) {
-    return new Promise((resolve, reject) => {
-        getSqliteDb().then(db => {
-            db.all(query, params, (err, rows) => {
-                if (err) {
-                    logger.error('SQLite query error:', err);
-                    return reject(err);
-                }
-                resolve(rows);
-            });
-        }).catch(reject);
-    });
+function executeSQLiteQuery(query, params = {}) {
+    if (!sqliteDb) {
+        if (!initializeSQLite()) {
+            throw new Error('SQLite database not available');
+        }
+    }
+    
+    try {
+        const { query: sqliteQuery, params: sqliteParams } = convertQueryToSQLite(query, params);
+        
+        // Handle array params (for INSERT with multiple values)
+        if (Array.isArray(params)) {
+            const stmt = sqliteDb.prepare(sqliteQuery);
+            const result = stmt.all(...params);
+            return result;
+        }
+        
+        const stmt = sqliteDb.prepare(sqliteQuery);
+        const result = stmt.all(...sqliteParams);
+        return result;
+    } catch (error) {
+        logger.error('SQLite query error:', error);
+        throw error;
+    }
+}
+
+/**
+ * Execute SQLite query (insert/update/delete)
+ */
+function executeSQLiteWrite(query, params = {}) {
+    if (!sqliteDb) {
+        if (!initializeSQLite()) {
+            throw new Error('SQLite database not available');
+        }
+    }
+    
+    try {
+        const { query: sqliteQuery, params: sqliteParams } = convertQueryToSQLite(query, params);
+        
+        // Handle array params
+        if (Array.isArray(params)) {
+            const stmt = sqliteDb.prepare(sqliteQuery);
+            const result = stmt.run(...params);
+            return result;
+        }
+        
+        const stmt = sqliteDb.prepare(sqliteQuery);
+        const result = stmt.run(...sqliteParams);
+        return result;
+    } catch (error) {
+        logger.error('SQLite write error:', error);
+        throw error;
+    }
+}
+
+/**
+ * Get database type
+ */
+function getDatabaseType() {
+    return useSQLite ? 'sqlite' : 'sqlserver';
+}
+
+/**
+ * Check if using SQLite
+ */
+function isUsingSQLite() {
+    return useSQLite;
+}
+
+/**
+ * Check if database is connected
+ */
+function isConnected() {
+    if (useSQLite) {
+        return sqliteDb !== null;
+    }
+    return sqlServerPool !== null;
 }
 
 /**
@@ -225,26 +303,28 @@ async function closeConnections() {
             logger.info('SQL Server connection closed');
         }
         if (sqliteDb) {
-            sqliteDb.close((err) => {
-                if (err) {
-                    logger.error('Error closing SQLite:', err);
-                } else {
-                    logger.info('SQLite connection closed');
-                }
-            });
+            sqliteDb.close();
+            logger.info('SQLite connection closed');
         }
     } catch (error) {
         logger.error('Error closing connections:', error);
     }
 }
 
+// Initialize on load
+initializeDatabase().catch(err => {
+    logger.error('Database initialization error:', err);
+});
+
 module.exports = {
-    getSqlServerPool,
+    initializeDatabase,
     executeQuery,
-    executeProcedure,
-    getSqliteDb,
-    executeSqliteQuery,
+    executeSQLiteQuery,
+    executeSQLiteWrite,
+    getDatabaseType,
+    isConnected,
     closeConnections,
-    isLocalMode
+    getSqlServerPool,
+    isUsingSQLite
 };
 

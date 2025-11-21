@@ -7,204 +7,39 @@
     </div>
     
     <div class="row g-4">
-        <!-- Import Section -->
         <div class="col-md-6">
             <div class="card shadow-lg">
                 <div class="card-header bg-primary text-white">
                     <h5 class="mb-0"><i class="fas fa-upload"></i> ייבוא נתונים</h5>
                 </div>
                 <div class="card-body">
-                    <% if (typeof error !== 'undefined' && error) { %>
-                        <div class="alert alert-danger"><%= error %></div>
-                    <% } %>
-                    
-                    <form method="POST" action="/import/upload" enctype="multipart/form-data" id="importForm">
-                        <div class="mb-3">
-                            <label class="form-label"><i class="fas fa-file"></i> בחר קובץ</label>
-                            <input type="file" name="file" class="form-control" accept=".csv,.json,.xlsx,.xls" required>
-                            <small class="text-muted">תמיכה בקבצי CSV, JSON, Excel</small>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label class="form-label"><i class="fas fa-tag"></i> סוג פריט</label>
-                            <select name="itemType" class="form-control" id="itemType">
-                                <option value="CI">CI</option>
-                                <option value="Computer">מחשב</option>
-                                <option value="Printer">מדפסת</option>
-                                <option value="Contact">איש קשר</option>
-                                <option value="Supplier">ספק</option>
-                                <option value="Application">אפליקציה</option>
-                                <option value="Imported">מיובא</option>
-                            </select>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label class="form-label"><i class="fas fa-map"></i> מיפוי שדות (JSON - אופציונלי)</label>
-                            <textarea name="mapping" class="form-control" rows="4" id="mappingField" placeholder='{"name": "שם", "f0": "שדה1", "f1": "שדה2"}'></textarea>
-                            <small class="text-muted">הזן JSON למיפוי שדות. אם ריק, ייעשה מיפוי אוטומטי</small>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-primary w-100">
-                            <i class="fas fa-upload"></i> ייבא קובץ
-                        </button>
-                    </form>
-                    
-                    <div class="mt-3">
-                        <button class="btn btn-outline-info w-100" onclick="loadTemplate()">
-                            <i class="fas fa-download"></i> הורד תבנית
-                        </button>
-                    </div>
+                    <p class="text-muted">ייבוא נתונים - בפיתוח</p>
                 </div>
             </div>
         </div>
         
-        <!-- Export Section -->
         <div class="col-md-6">
             <div class="card shadow-lg">
                 <div class="card-header bg-success text-white">
                     <h5 class="mb-0"><i class="fas fa-file-export"></i> ייצוא נתונים</h5>
                 </div>
                 <div class="card-body">
-                    <form method="GET" action="/import/export">
-                        <div class="mb-3">
-                            <label class="form-label"><i class="fas fa-filter"></i> סוג פריט</label>
-                            <select name="itemType" class="form-control">
-                                <option value="">הכל</option>
-                                <option value="Computer">מחשבים</option>
-                                <option value="Printer">מדפסות</option>
-                                <option value="Contact">אנשי קשר</option>
-                                <option value="Supplier">ספקים</option>
-                                <option value="Application">אפליקציות</option>
-                            </select>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label class="form-label"><i class="fas fa-file-code"></i> פורמט</label>
-                            <select name="format" class="form-control">
-                                <option value="csv">CSV</option>
-                                <option value="json">JSON</option>
-                                <option value="xlsx">Excel</option>
-                            </select>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-success w-100">
-                            <i class="fas fa-download"></i> ייצא נתונים
-                        </button>
-                    </form>
-                    
-                    <hr>
-                    
-                    <h6 class="mb-3"><i class="fas fa-database"></i> ייצוא למסד נתונים</h6>
-                    <div class="d-grid gap-2">
-                        <button class="btn btn-outline-primary" onclick="exportToSQLite()">
-                            <i class="fas fa-database"></i> ייצא ל-SQLite (מקומי)
-                        </button>
-                        <button class="btn btn-outline-secondary" onclick="downloadSQLite()">
-                            <i class="fas fa-download"></i> הורד SQLite DB
-                        </button>
-                    </div>
+                    <p class="text-muted">ייצוא נתונים - בפיתוח</p>
                 </div>
             </div>
         </div>
     </div>
     
-    <!-- SQLite Local Mode -->
-    <div class="row mt-4">
-        <div class="col-md-12">
-            <div class="card shadow-lg">
-                <div class="card-header bg-info text-white">
-                    <h5 class="mb-0"><i class="fas fa-server"></i> מצב מקומי - SQLite</h5>
-                </div>
-                <div class="card-body">
-                    <p class="mb-3">הפעל את המערכת במצב מקומי עם SQLite ללא חיבור לשרת SQL</p>
-                    <div class="d-flex gap-2">
-                        <button class="btn btn-info" onclick="enableLocalMode()">
-                            <i class="fas fa-toggle-on"></i> הפעל מצב מקומי
-                        </button>
-                        <button class="btn btn-outline-info" onclick="syncToSQLite()">
-                            <i class="fas fa-sync"></i> סנכרן נתונים ל-SQLite
-                        </button>
-                        <span id="localModeStatus" class="badge bg-secondary align-self-center ms-2">מצב שרת</span>
-                    </div>
-                </div>
-            </div>
+    <div class="card shadow-lg mt-4">
+        <div class="card-body">
+            <h5><i class="fas fa-database"></i> מצב מסד נתונים</h5>
+            <p>
+                <span class="badge bg-<%= dbConnected ? 'success' : 'danger' %>">
+                    <%= dbType.toUpperCase() %> - <%= dbConnected ? 'מחובר' : 'לא מחובר' %>
+                </span>
+            </p>
         </div>
     </div>
 </div>
-
-<script>
-async function loadTemplate() {
-    const itemType = document.getElementById('itemType').value;
-    try {
-        const response = await fetch(`/import/template?type=${itemType}`);
-        const data = await response.json();
-        if (data.success) {
-            // Convert template to CSV format
-            const csv = Object.keys(data.template).join(',') + '\\n' + Object.values(data.template).join(',');
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `template-${itemType}.csv`;
-            a.click();
-        }
-    } catch (error) {
-        console.error('Error loading template:', error);
-        alert('שגיאה בטעינת התבנית');
-    }
-}
-
-async function exportToSQLite() {
-    try {
-        const response = await fetch('/import/export-sqlite', { method: 'POST' });
-        const data = await response.json();
-        if (data.success) {
-            alert('הנתונים יוצאו בהצלחה ל-SQLite!');
-        } else {
-            alert('שגיאה: ' + (data.error || 'Unknown error'));
-        }
-    } catch (error) {
-        console.error('Export error:', error);
-        alert('שגיאה בייצוא');
-    }
-}
-
-async function downloadSQLite() {
-    window.location.href = '/import/download-sqlite';
-}
-
-async function enableLocalMode() {
-    if (confirm('האם אתה בטוח שברצונך לעבור למצב מקומי? זה יגרום לניתוק מהשרת SQL.')) {
-        try {
-            const response = await fetch('/import/enable-local-mode', { method: 'POST' });
-            const data = await response.json();
-            if (data.success) {
-                document.getElementById('localModeStatus').textContent = 'מצב מקומי';
-                document.getElementById('localModeStatus').className = 'badge bg-success align-self-center ms-2';
-                alert('מצב מקומי הופעל! המערכת תעבוד עם SQLite מקומי.');
-                setTimeout(() => location.reload(), 2000);
-            }
-        } catch (error) {
-            console.error('Error enabling local mode:', error);
-            alert('שגיאה בהפעלת מצב מקומי');
-        }
-    }
-}
-
-async function syncToSQLite() {
-    try {
-        const response = await fetch('/import/sync-sqlite', { method: 'POST' });
-        const data = await response.json();
-        if (data.success) {
-            alert(`סונכרן בהצלחה! ${data.count || 0} רשומות`);
-        } else {
-            alert('שגיאה: ' + (data.error || 'Unknown error'));
-        }
-    } catch (error) {
-        console.error('Sync error:', error);
-        alert('שגיאה בסנכרון');
-    }
-}
-</script>
 ` }) %>
 

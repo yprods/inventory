@@ -1,6 +1,6 @@
 /**
  * Sefer Maarexet - Main Server File
- * Modern Node.js/Express Implementation
+ * Modern Node.js/Express Implementation with SQLite Fallback
  */
 
 require('dotenv').config();
@@ -58,26 +58,20 @@ const PORT = process.env.PORT || 1212;
 
 // Security middleware
 app.use(helmet({
-    contentSecurityPolicy: false, // Adjust based on your needs
+    contentSecurityPolicy: false, // Allow inline scripts for EJS
     crossOriginEmbedderPolicy: false
 }));
 
-// CORS configuration
-app.use(cors({
-    origin: process.env.CLIENT_URL || "*",
-    credentials: true
-}));
-
-// Compression
 app.use(compression());
+app.use(cors());
 
 // Body parsing
-app.use(bodyParser.json({ limit: '10mb' }));
-app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
 
 // Session configuration
 app.use(session({
-    secret: process.env.SESSION_SECRET || 'your-secret-key-change-this',
+    secret: process.env.SESSION_SECRET || 'sefer-maarexet-secret-key-change-in-production',
     resave: false,
     saveUninitialized: false,
     cookie: {
@@ -87,25 +81,43 @@ app.use(session({
     }
 }));
 
+// View engine setup
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+
 // Static files
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// View engine setup (EJS)
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
+// Make io available to routes
+app.set('io', io);
+
+// Make user available to all views via res.locals
+app.use((req, res, next) => {
+    if (req.session && req.session.user) {
+        res.locals.user = req.session.user;
+    } else if (req.session && req.session.pinAuthenticated) {
+        res.locals.user = {
+            name: req.session.userName || 'Guest',
+            isPinAuthenticated: true
+        };
+    }
+    next();
+});
 
 // ============================================================================
 // ROUTES
 // ============================================================================
 
-// Public routes
+// Public routes (must be before protected routes)
 app.use('/auth', authRoutes);
 
-// Protected routes
+// API routes (before authentication)
+app.use('/api', apiRoutes);
+
+// Protected routes (require authentication)
 app.use('/', authenticateUser, homeRoutes);
-app.use('/chat', authenticateUser, chatRoutes);
-app.use('/api', authenticateUser, apiRoutes);
+app.use('/', authenticateUser, chatRoutes);
 app.use('/', authenticateUser, searchRoutes);
 app.use('/', authenticateUser, fileRoutes);
 app.use('/', authenticateUser, connectionsRoutes);
@@ -121,32 +133,41 @@ app.use('/', authenticateUser, auditRoutes);
 app.use('/', permissionsRoutes);
 app.use('/', adminRoutes);
 
-// Root redirect
+// Root route - redirect to home or login (must be after all other routes)
 app.get('/', (req, res) => {
-    if (req.session.user) {
-        res.redirect('/home');
-    } else {
-        res.redirect('/auth/login');
+    const search = req.query.search;
+    if (search && search.trim()) {
+        return res.redirect(`/datablocks?search=${encodeURIComponent(search.trim())}`);
     }
+    
+    if (req.session && (req.session.user || req.session.pinAuthenticated)) {
+        return res.redirect('/home');
+    }
+    res.redirect('/auth/login');
 });
 
 // 404 handler
 app.use((req, res) => {
     res.status(404).render('error', {
-        title: '404 - Not Found',
+        title: '404 - לא נמצא',
         message: 'הדף המבוקש לא נמצא'
     });
 });
 
-// Error handler
+// Error handler (must be last)
 app.use(errorHandler);
 
 // ============================================================================
-// SOCKET.IO - CHAT FUNCTIONALITY
+// SOCKET.IO SETUP
 // ============================================================================
 
-const chatManager = require('./services/chatManager');
-chatManager.initialize(io);
+io.on('connection', (socket) => {
+    logger.info('Client connected:', socket.id);
+    
+    socket.on('disconnect', () => {
+        logger.info('Client disconnected:', socket.id);
+    });
+});
 
 // ============================================================================
 // SERVER STARTUP
@@ -155,19 +176,32 @@ chatManager.initialize(io);
 server.listen(PORT, () => {
     logger.info(`Server running on port ${PORT}`);
     logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
-    console.log(`\n🚀 Sefer Maarexet Server Started!`);
-    console.log(`📍 http://localhost:${PORT}`);
-    console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}\n`);
+    
+    // Check database connection
+    const { getDatabaseType, isConnected } = require('./config/database');
+    logger.info(`Database: ${getDatabaseType()} (${isConnected() ? 'connected' : 'disconnected'})`);
 });
 
 // Graceful shutdown
-process.on('SIGTERM', () => {
-    logger.info('SIGTERM signal received: closing HTTP server');
+process.on('SIGTERM', async () => {
+    logger.info('SIGTERM received, shutting down gracefully');
+    const { closeConnections } = require('./config/database');
+    await closeConnections();
     server.close(() => {
-        logger.info('HTTP server closed');
+        logger.info('Server closed');
         process.exit(0);
     });
 });
 
-module.exports = { app, server, io };
+process.on('SIGINT', async () => {
+    logger.info('SIGINT received, shutting down gracefully');
+    const { closeConnections } = require('./config/database');
+    await closeConnections();
+    server.close(() => {
+        logger.info('Server closed');
+        process.exit(0);
+    });
+});
+
+module.exports = app;
 

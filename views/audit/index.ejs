@@ -4,131 +4,48 @@
         <h1 class="display-5 fw-bold">
             <i class="fas fa-clipboard-list text-primary"></i> מרכז ביקורת
         </h1>
-        <a href="/audit/export?format=csv" class="btn btn-primary">
-            <i class="fas fa-download"></i> ייצא CSV
-        </a>
     </div>
     
-    <!-- Statistics -->
-    <div class="row g-4 mb-4">
-        <div class="col-md-3">
-            <div class="card bg-primary text-white">
-                <div class="card-body text-center">
-                    <h3><%= stats.total %></h3>
-                    <p class="mb-0">סה"כ פעולות</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card bg-info text-white">
-                <div class="card-body text-center">
-                    <h3><%= Object.keys(stats.byUser).length %></h3>
-                    <p class="mb-0">משתמשים פעילים</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card bg-success text-white">
-                <div class="card-body text-center">
-                    <h3><%= Object.keys(stats.byAction).length %></h3>
-                    <p class="mb-0">סוגי פעולות</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card bg-warning text-white">
-                <div class="card-body text-center">
-                    <h3><%= Object.keys(stats.byEntityType).length %></h3>
-                    <p class="mb-0">סוגי ישויות</p>
-                </div>
-            </div>
-        </div>
-    </div>
+    <% if (typeof error !== 'undefined' && error) { %>
+        <div class="alert alert-danger"><%= error %></div>
+    <% } %>
     
-    <!-- Filters -->
-    <div class="card shadow-md mb-4">
-        <div class="card-body">
-            <form method="GET" action="/audit" class="row g-3">
-                <div class="col-md-3">
-                    <label class="form-label"><i class="fas fa-user"></i> משתמש</label>
-                    <select name="user" class="form-control">
-                        <option value="">הכל</option>
-                        <% users.forEach(u => { %>
-                            <option value="<%= u.UserName %>" <%= filters.user === u.UserName ? 'selected' : '' %>>
-                                <%= u.UserName %>
-                            </option>
-                        <% }); %>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label"><i class="fas fa-tasks"></i> פעולה</label>
-                    <select name="action" class="form-control">
-                        <option value="">הכל</option>
-                        <% actions.forEach(a => { %>
-                            <option value="<%= a.Action %>" <%= filters.action === a.Action ? 'selected' : '' %>>
-                                <%= a.Action %>
-                            </option>
-                        <% }); %>
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label"><i class="fas fa-calendar"></i> מתאריך</label>
-                    <input type="date" name="dateFrom" class="form-control" value="<%= filters.dateFrom %>">
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label"><i class="fas fa-calendar"></i> עד תאריך</label>
-                    <input type="date" name="dateTo" class="form-control" value="<%= filters.dateTo %>">
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label">&nbsp;</label>
-                    <button type="submit" class="btn btn-primary w-100">
-                        <i class="fas fa-search"></i> חפש
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-    
-    <!-- Audit Logs -->
-    <div class="card shadow-lg">
-        <div class="card-header bg-dark text-white">
-            <h5 class="mb-0"><i class="fas fa-list"></i> יומן ביקורת</h5>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>תאריך/שעה</th>
-                            <th>משתמש</th>
-                            <th>פעולה</th>
-                            <th>סוג ישות</th>
-                            <th>שם ישות</th>
-                            <th>IP</th>
-                            <th>פעולות</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <% logs.forEach(log => { %>
+    <% if (logs && logs.length > 0) { %>
+        <div class="card shadow-lg">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
                             <tr>
-                                <td><%= new Date(log.CreatedAt).toLocaleString('he-IL') %></td>
-                                <td><strong><%= log.UserName %></strong></td>
-                                <td><span class="badge bg-primary"><%= log.Action %></span></td>
-                                <td><%= log.EntityType || '-' %></td>
-                                <td><%= log.EntityName || '-' %></td>
-                                <td><small class="text-muted"><%= log.IpAddress || '-' %></small></td>
-                                <td>
-                                    <a href="/audit/<%= log.Id %>" class="btn btn-sm btn-outline-primary">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                </td>
+                                <th>תאריך/שעה</th>
+                                <th>משתמש</th>
+                                <th>פעולה</th>
+                                <th>פרטים</th>
                             </tr>
-                        <% }); %>
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            <% logs.forEach(log => { %>
+                                <tr>
+                                    <td><%= new Date(log.CreatedAt || log.Timestamp).toLocaleString('he-IL') %></td>
+                                    <td><%= log.UserName || log.User || '-' %></td>
+                                    <td><%= log.Action || '-' %></td>
+                                    <td><%= log.Details || log.EntityName || '-' %></td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
-    </div>
+    <% } else { %>
+        <div class="card shadow-lg">
+            <div class="card-body text-center py-5">
+                <i class="fas fa-clipboard-list fa-4x text-muted mb-3"></i>
+                <h4>אין רשומות ביקורת</h4>
+                <p class="text-muted">אין רשומות ביקורת להצגה</p>
+            </div>
+        </div>
+    <% } %>
 </div>
 ` }) %>
 

@@ -1,63 +1,64 @@
-/**
- * Connection Map Routes
- */
-
 const express = require('express');
 const router = express.Router();
-const connectionMapService = require('../services/connectionMapService');
+const { executeQuery, isUsingSQLite } = require('../config/database');
 const logger = require('../utils/logger');
 
-/**
- * Connection map visualization page
- */
 router.get('/connections/map', async (req, res) => {
     try {
-        const { item } = req.query;
+        const useSQLite = isUsingSQLite();
         
-        let mapData = null;
-        let itemConnections = null;
-        
-        if (item) {
-            itemConnections = await connectionMapService.getItemConnections(item);
+        let query;
+        if (useSQLite) {
+            query = 'SELECT CI.Name, CI.CI_ID FROM CI LIMIT 50';
         } else {
-            mapData = await connectionMapService.getFullConnectionMap();
+            query = 'SELECT TOP 50 CI.Name, CI.CI_ID FROM CI';
         }
+        
+        const items = await executeQuery(query, {});
         
         res.render('connections/map', {
             title: 'מפת קשרים',
-            item: item || null,
-            mapData: mapData,
-            itemConnections: itemConnections,
+            items: items || [],
             user: req.user || { name: 'Guest' }
         });
     } catch (error) {
-        logger.error('Connection map page error:', error);
-        res.status(500).render('error', {
-            title: 'שגיאה',
-            message: 'שגיאה בטעינת מפת הקשרים'
+        logger.error('Connections map error:', error);
+        res.render('connections/map', {
+            title: 'מפת קשרים',
+            items: [],
+            error: 'שגיאה בטעינת מפת הקשרים',
+            user: req.user || { name: 'Guest' }
         });
     }
 });
 
-/**
- * Item connections page
- */
-router.get('/connections/item/:itemName', async (req, res) => {
+router.get('/connections/item/:name', async (req, res) => {
     try {
-        const { itemName } = req.params;
-        const connections = await connectionMapService.getItemConnections(itemName);
-        const relatedItems = await connectionMapService.getRelatedItems(itemName);
+        const { name } = req.params;
+        
+        const useSQLite = isUsingSQLite();
+        
+        let query;
+        let params;
+        if (useSQLite) {
+            query = `SELECT CI.*, DATABOX.* FROM CI LEFT JOIN DATABOX ON CI.CI_ID = DATABOX.name WHERE CI.Name = ? OR CI.CI_ID = ? LIMIT 1`;
+            params = [name, name];
+        } else {
+            query = `SELECT TOP 1 CI.*, DATABOX.* FROM CI LEFT JOIN DATABOX ON CI.CI_ID = DATABOX.name WHERE CI.Name = @name OR CI.CI_ID = @name`;
+            params = { name };
+        }
+        
+        const items = await executeQuery(query, params);
+        const item = items[0] || null;
         
         res.render('connections/item', {
-            title: `קשרים - ${itemName}`,
-            itemName: itemName,
-            connections: connections,
-            relatedItems: relatedItems,
+            title: `קשרים - ${name}`,
+            item: item,
             user: req.user || { name: 'Guest' }
         });
     } catch (error) {
-        logger.error('Item connections page error:', error);
-        res.status(500).render('error', {
+        logger.error('Connections item error:', error);
+        res.render('error', {
             title: 'שגיאה',
             message: 'שגיאה בטעינת הקשרים'
         });
@@ -65,4 +66,3 @@ router.get('/connections/item/:itemName', async (req, res) => {
 });
 
 module.exports = router;
-

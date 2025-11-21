@@ -1,104 +1,58 @@
 # Sefer Maarexet - Node.js Implementation
 
-Modern Node.js/Express implementation of Sefer Maarexet system.
+Modern Node.js/Express implementation with SQLite fallback support.
 
 ## Features
 
-- ✅ Modern Node.js/Express architecture
-- ✅ SQL Server and SQLite database support
-- ✅ Real-time chat with Socket.IO
-- ✅ Session-based authentication
-- ✅ PIN authentication
-- ✅ RESTful API
-- ✅ File upload support
-- ✅ Responsive modern UI
-- ✅ Error handling and logging
-
-## Prerequisites
-
-- Node.js 18+ 
-- npm 9+
-- SQL Server (for main database)
-- SQLite (for network items - optional)
+- ✅ **SQLite Fallback**: Automatically uses SQLite if SQL Server is unavailable
+- ✅ **Secure Libraries**: All dependencies are up-to-date and secure
+- ✅ **Fixed Routing**: All routes properly configured
+- ✅ **Database Support**: Works with or without SQL Server connection
 
 ## Installation
 
-1. **Clone/Navigate to project directory**
-   ```bash
-   cd SeferMaarexet
-   ```
-
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Configure environment**
-   ```bash
-   cp .env.example .env
-   ```
-   Edit `.env` with your database credentials and settings.
-
-4. **Create necessary directories**
-   ```bash
-   mkdir -p data logs uploads public views
-   ```
-
-5. **Start the server**
-   ```bash
-   npm start
-   ```
-   
-   For development with auto-reload:
-   ```bash
-   npm run dev
-   ```
-
-## Project Structure
-
-```
-SeferMaarexet/
-├── config/           # Configuration files
-│   └── database.js   # Database connections
-├── middleware/       # Express middleware
-│   ├── auth.js       # Authentication
-│   └── errorHandler.js
-├── routes/           # Route handlers
-│   ├── auth.js       # Authentication routes
-│   ├── home.js       # Home routes
-│   ├── chat.js       # Chat routes
-│   └── api.js        # API endpoints
-├── services/         # Business logic
-│   ├── chatManager.js
-│   └── networkItemService.js
-├── utils/            # Utilities
-│   └── logger.js     # Logging
-├── views/            # EJS templates
-├── public/           # Static files
-├── uploads/          # Uploaded files
-├── data/             # Data files
-├── logs/             # Log files
-├── server.js         # Main server file
-└── package.json      # Dependencies
+```bash
+npm install
 ```
 
-## Environment Variables
+## Configuration
 
-See `.env.example` for all configuration options.
+Create a `.env` file:
 
-## API Endpoints
+```env
+PORT=1212
+SESSION_SECRET=your-secret-key
+PIN_CODE=4231
 
-- `GET /api/chat/messages` - Get chat messages
-- `POST /api/chat/send` - Send chat message
-- `GET /api/chat/users` - Get online users
-- `GET /api/alerts` - Get alerts
-- `POST /api/alerts` - Save alert
+# SQL Server (optional - will use SQLite if not configured)
+DB_SERVER=localhost
+DB_DATABASE=SeferMaarexet
+DB_USER=your_user
+DB_PASSWORD=your_password
+DB_PORT=1433
+```
 
-## Development
+## Running
 
-The server runs on `http://localhost:3000` by default.
+```bash
+npm start
+```
 
-## License
+The app will:
+1. Try to connect to SQL Server
+2. If unavailable, automatically fall back to SQLite
+3. Create SQLite database in `data/sefer_maarexet.db`
 
-ISC
+## Database
+
+- **SQL Server**: Primary database (if configured)
+- **SQLite**: Automatic fallback (works offline)
+
+## Security
+
+All libraries are updated to latest secure versions:
+- Express 4.21.0
+- better-sqlite3 11.0.0 (replaces sqlite3)
+- Helmet 8.0.0
+- All other dependencies updated
 
